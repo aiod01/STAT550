@@ -1,0 +1,140 @@
+Gender
+1-male
+2-female
+
+Education level (ED_Level)
+1 중등교육 이하
+2 고등교육
+3 학사 학위 (ISCED 5A)
+4 석사/박사 학위 (ISCED 5A/6)
+
+Education level (EDCAT6)
+1 중등교육 하 이하 (ISCED 1,2, 3C short 이하)
+2 중등교육 상 (ISCED 3A-B, C long)
+3 중등교육 이상, 고등교육 제외 (ISCED 4A-B-C)
+4 고등교육 ? 전문학사 학위 (ISCED 5B)
+5 고등교육 ? 학사 학위 (ISCED 5A)
+6 고등교육 ? 석사/박사 학위 (ISCED 5A/6)
+7 고등교육 ? 학사/석사/박사 학위 (ISCED 5A/6)
+
+Managing others (Mgr)(D_Q08a)
+01 예
+02 아니오
+DK 모름
+RF 응답거부
+
+Managing how many subornates (Mgr_c)(D_Q08b)
+01 1-5명
+02 6-10명
+03 11-24명
+04 25-99명
+05 100명 이상
+DK 모름
+RF 응답거부
+
+------------------------------------------------------------------
+work_lrnM
+01 전혀 아님
+02 약간 그러함
+03 어느 정도 그러함
+04 상당히 그러함
+05 매우 그러함
+
+Current work - Learning - Learning from co-workers/supervisors
+Current work - Learning - Learning-by-doing
+Current work - Learning - Keeping up to date
+
+work_flexM
+01 전혀 없음
+
+02 별로 없음
+03 어느 정도 있음
+04 많이 있음
+05 매우 많이 있음
+DK 모름
+RF 응답거부
+
+Current work - Work flexibility - Sequence of tasks
+Current work - Work flexibility - How to do the work
+Current work - Work flexibility - Speed of work
+Current work - Work flexibility - Working hours
+
+NFE12
+Participated in non-formal education in 12 months preceding survey (derived)
+0 비형식 교육에 참여하지 않음
+1 비형식 교육에 참여함
+
+FNFAET12
+Participated in formal or non-formal AET in 12 mths preceding survey (see AETPOP) (derived)
+0 형식/비형식 AET에 참여하지 않음
+1 형식/비형식 AET에 참여함
+
+FNFE12JR
+Participated in formal or non-formal education for job-related reasons in 12 mths preceding the survey (derived)
+0 직업 관련"된 이유로" "형식/"비형식 교육에 참여하지 않음
+1 직업 관련"된 이유로" "형식/"비형식 교육에 참여함
+
+FNFAET12JR
+Participated in formal or non-formal AET for job related reasons in 12 mths preceding survey (see AETPOP) (derived)
+0 직업 관련 이유로 형식/비형식 성인교육및훈련에 참여하지 않음
+1 직업 관련 이유로 형식/비형식 성인교육및훈련에 참여함
+
+FNFAET12NJR
+Participated in formal or non-formal AET for non job related reasons in 12 mths preceding survey (see AETPOP) (derived)
+0 직업 관련되지 않은 이유로 형식/비형식 성인교육및훈련에 참여하지 않음
+1 직업 관련되지 않은 이유로 형식/비형식 성인교육및훈련에 참여함
+
+NFEHRS
+Number of hours of participation in non-formal education (derived)
+
+lit_use
+01 전혀 하지 않음
+02 몇 달에 한 번
+03 한 달에 한두 번
+04 일주일에 몇 번, 매일은 아님
+05 매일
+
+Skill use work - Literacy - Read letters memos or mails
+Skill use work - Literacy - Read directions or instructions
+Skill use work - Literacy - Read newspapers or magazines
+Skill use work - Literacy - Read professional journals or publications
+Skill use work - Literacy - Read books
+Skill use work - Literacy - Read manuals or reference materials
+Skill use work - Literacy - Read financial statements
+Skill use work - Literacy - Read diagrams maps or schematics
+Skill use work - Literacy - Write letters memos or mails
+Skill use work - Literacy - Write articles
+Skill use work - Literacy - Write reports
+Skill use work - Literacy - Fill in forms
+As part of job, read or use directions or instructions - levels collapsed (Trend-IALS/ALL)
+As part of job, read or use letters, memos, e-mails - levels collapsed (Trend-IALS/ALL)
+As part of job, read or use reports, articles, magazines, journals - levels collapsed (Trend-IALS/ALL)
+As part of job, read or use manuals, reference books, catalogues - levels collapsed (Trend-IALS/ALL)
+As part of job, read or use bills, invoices, spreadsheets, budget tables - levels collapsed (Trend-IALS/ALL)
+As part of job, read or use diagrams or schematics - levels collapsed (Trend-IALS/ALL)
+
+
+num_use
+01 전혀 하지 않음
+02 몇 달에 한 번
+03 한 달에 한두 번
+04 일주일에 몇 번, 매일은 아님
+05 매일
+
+Skill use work - Numeracy - How often - Calculating costs or budgets
+Skill use work - Numeracy - How often - Use or calculate fractions or %
+Skill use work - Numeracy - How often - Use a calculator
+Skill use work - Numeracy - How often - Prepare charts graphs or tables
+Skill use work - Numeracy - How often - Use simple algebra or formulas
+Skill use work - Numeracy - How often - Use advanced math or statistics
+Skill use work - ICT - Experience with computer in job
+Skill use work - ICT - Internet - How often - For mail
+Skill use work - ICT - Internet - How often - Work related info
+Skill use work - ICT - Internet - How often - Conduct transactions
+Skill use work - ICT - Computer - How often - Spreadsheets
+Skill use work - ICT - Computer - How often - Word
+Skill use work - ICT - Computer - How often - Programming language
+Skill use work - ICT - Computer - How often - Real-time discussions
+Skill use work - ICT - Computer - Level of computer use
+Skill use work - ICT - Computer - Got the skills needed
+Skill use work - ICT - Computer - Lack of skills affect career
