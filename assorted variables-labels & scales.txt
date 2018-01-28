@@ -3,56 +3,71 @@ Gender
 2-female
 
 Education level (ED_Level)
-1 Áßµî±³À° ÀÌÇÏ
-2 °íµî±³À°
-3 ÇĞ»ç ÇĞÀ§ (ISCED 5A)
-4 ¼®»ç/¹Ú»ç ÇĞÀ§ (ISCED 5A/6)
+1 ì¤‘ë“±êµìœ¡ ì´í•˜ under middle school
+2 ê³ ë“±êµìœ¡ High school
+3 í•™ì‚¬ í•™ìœ„ (ISCED 5A) Bachelor
+4 ì„ì‚¬/ë°•ì‚¬ í•™ìœ„ (ISCED 5A/6) Master/PhD
 
 Education level (EDCAT6)
-1 Áßµî±³À° ÇÏ ÀÌÇÏ (ISCED 1,2, 3C short ÀÌÇÏ)
-2 Áßµî±³À° »ó (ISCED 3A-B, C long)
-3 Áßµî±³À° ÀÌ»ó, °íµî±³À° Á¦¿Ü (ISCED 4A-B-C)
-4 °íµî±³À° ? Àü¹®ÇĞ»ç ÇĞÀ§ (ISCED 5B)
-5 °íµî±³À° ? ÇĞ»ç ÇĞÀ§ (ISCED 5A)
-6 °íµî±³À° ? ¼®»ç/¹Ú»ç ÇĞÀ§ (ISCED 5A/6)
-7 °íµî±³À° ? ÇĞ»ç/¼®»ç/¹Ú»ç ÇĞÀ§ (ISCED 5A/6)
+1 ì¤‘ë“±êµìœ¡ í•˜ ì´í•˜ (ISCED 1,2, 3C short ì´í•˜) under lower middle school, 
+2 ì¤‘ë“±êµìœ¡ ìƒ (ISCED 3A-B, C long) under higher middle school,
+3 ì¤‘ë“±êµìœ¡ ì´ìƒ, ê³ ë“±êµìœ¡ ì œì™¸ (ISCED 4A-B-C) completed middle school, not including high school
+4 ê³ ë“±êµìœ¡ ? ì „ë¬¸í•™ì‚¬ í•™ìœ„ (ISCED 5B) college
+5 ê³ ë“±êµìœ¡ ? í•™ì‚¬ í•™ìœ„ (ISCED 5A) bachelor
+6 ê³ ë“±êµìœ¡ ? ì„ì‚¬/ë°•ì‚¬ í•™ìœ„ (ISCED 5A/6) master/PhD
+7 ê³ ë“±êµìœ¡ ? í•™ì‚¬/ì„ì‚¬/ë°•ì‚¬ í•™ìœ„ (ISCED 5A/6) bachelor/master/PhD
 
 Managing others (Mgr)(D_Q08a)
-01 ¿¹
-02 ¾Æ´Ï¿À
-DK ¸ğ¸§
-RF ÀÀ´ä°ÅºÎ
+01 ì˜ˆ yes 
+02 ì•„ë‹ˆì˜¤ no
+DK ëª¨ë¦„ don't know
+RF ì‘ë‹µê±°ë¶€ refuse response
 
 Managing how many subornates (Mgr_c)(D_Q08b)
-01 1-5¸í
-02 6-10¸í
-03 11-24¸í
-04 25-99¸í
-05 100¸í ÀÌ»ó
-DK ¸ğ¸§
-RF ÀÀ´ä°ÅºÎ
+01 1-5ëª… #'ëª…' means people. 1-5 people
+02 6-10ëª… 6-10 people
+03 11-24ëª…
+04 25-99ëª…
+05 100ëª… ì´ìƒ more than 100 people
+DK ëª¨ë¦„ don't know
+RF ì‘ë‹µê±°ë¶€ refuse response
 
 ------------------------------------------------------------------
 work_lrnM
-01 ÀüÇô ¾Æ´Ô
-02 ¾à°£ ±×·¯ÇÔ
-03 ¾î´À Á¤µµ ±×·¯ÇÔ
-04 »ó´çÈ÷ ±×·¯ÇÔ
-05 ¸Å¿ì ±×·¯ÇÔ
+01 ì „í˜€ ì•„ë‹˜ not at all;strong denial
+02 ì•½ê°„ ê·¸ëŸ¬í•¨ somewhat agree
+03 ì–´ëŠ ì •ë„ ê·¸ëŸ¬í•¨ agree
+04 ìƒë‹¹íˆ ê·¸ëŸ¬í•¨ stronger agreement
+05 ë§¤ìš° ê·¸ëŸ¬í•¨ strongest agree
+
+# It is Likert scale. The basic idea is  
+01Strongly disagree
+02Disagree
+03Neither agree nor disagree
+04Agree
+05Strongly agree
+
+
 
 Current work - Learning - Learning from co-workers/supervisors
 Current work - Learning - Learning-by-doing
 Current work - Learning - Keeping up to date
 
 work_flexM
-01 ÀüÇô ¾øÀ½
-
-02 º°·Î ¾øÀ½
-03 ¾î´À Á¤µµ ÀÖÀ½
-04 ¸¹ÀÌ ÀÖÀ½
-05 ¸Å¿ì ¸¹ÀÌ ÀÖÀ½
-DK ¸ğ¸§
-RF ÀÀ´ä°ÅºÎ
+# It is Likert scale. 
+01 ì „í˜€ ì—†ìŒ Not at all
+02 ë³„ë¡œ ì—†ìŒ Not that much
+03 ì–´ëŠ ì •ë„ ìˆìŒ somewhat exist
+04 ë§ì´ ìˆìŒ pretty much exist
+05 ë§¤ìš° ë§ì´ ìˆìŒ exist a lot
+DK ëª¨ë¦„ Don't know
+RF ì‘ë‹µê±°ë¶€ refuse rÃ©ponse
+# It is Likert scale. The basic idea is  
+01Strongly disagree
+02Disagree
+03Neither agree nor disagree
+04Agree
+05Strongly agree
 
 Current work - Work flexibility - Sequence of tasks
 Current work - Work flexibility - How to do the work
@@ -61,38 +76,44 @@ Current work - Work flexibility - Working hours
 
 NFE12
 Participated in non-formal education in 12 months preceding survey (derived)
-0 ºñÇü½Ä ±³À°¿¡ Âü¿©ÇÏÁö ¾ÊÀ½
-1 ºñÇü½Ä ±³À°¿¡ Âü¿©ÇÔ
+0 ë¹„í˜•ì‹ êµìœ¡ì— ì°¸ì—¬í•˜ì§€ ì•ŠìŒ not participating
+1 ë¹„í˜•ì‹ êµìœ¡ì— ì°¸ì—¬í•¨  participating
 
 FNFAET12
 Participated in formal or non-formal AET in 12 mths preceding survey (see AETPOP) (derived)
-0 Çü½Ä/ºñÇü½Ä AET¿¡ Âü¿©ÇÏÁö ¾ÊÀ½
-1 Çü½Ä/ºñÇü½Ä AET¿¡ Âü¿©ÇÔ
+0 í˜•ì‹/ë¹„í˜•ì‹ AETì— ì°¸ì—¬í•˜ì§€ ì•ŠìŒ not participating
+1 í˜•ì‹/ë¹„í˜•ì‹ AETì— ì°¸ì—¬í•¨ participating
 
 FNFE12JR
 Participated in formal or non-formal education for job-related reasons in 12 mths preceding the survey (derived)
-0 Á÷¾÷ °ü·Ã"µÈ ÀÌÀ¯·Î" "Çü½Ä/"ºñÇü½Ä ±³À°¿¡ Âü¿©ÇÏÁö ¾ÊÀ½
-1 Á÷¾÷ °ü·Ã"µÈ ÀÌÀ¯·Î" "Çü½Ä/"ºñÇü½Ä ±³À°¿¡ Âü¿©ÇÔ
+0 ì§ì—… ê´€ë ¨"ëœ ì´ìœ ë¡œ" "í˜•ì‹/"ë¹„í˜•ì‹ êµìœ¡ì— ì°¸ì—¬í•˜ì§€ ì•ŠìŒ not participating
+1 ì§ì—… ê´€ë ¨"ëœ ì´ìœ ë¡œ" "í˜•ì‹/"ë¹„í˜•ì‹ êµìœ¡ì— ì°¸ì—¬í•¨  participating
 
 FNFAET12JR
 Participated in formal or non-formal AET for job related reasons in 12 mths preceding survey (see AETPOP) (derived)
-0 Á÷¾÷ °ü·Ã ÀÌÀ¯·Î Çü½Ä/ºñÇü½Ä ¼ºÀÎ±³À°¹×ÈÆ·Ã¿¡ Âü¿©ÇÏÁö ¾ÊÀ½
-1 Á÷¾÷ °ü·Ã ÀÌÀ¯·Î Çü½Ä/ºñÇü½Ä ¼ºÀÎ±³À°¹×ÈÆ·Ã¿¡ Âü¿©ÇÔ
+0 ì§ì—… ê´€ë ¨ ì´ìœ ë¡œ í˜•ì‹/ë¹„í˜•ì‹ ì„±ì¸êµìœ¡ë°í›ˆë ¨ì— ì°¸ì—¬í•˜ì§€ ì•ŠìŒ not participating
+1 ì§ì—… ê´€ë ¨ ì´ìœ ë¡œ í˜•ì‹/ë¹„í˜•ì‹ ì„±ì¸êµìœ¡ë°í›ˆë ¨ì— ì°¸ì—¬í•¨ participating
 
 FNFAET12NJR
 Participated in formal or non-formal AET for non job related reasons in 12 mths preceding survey (see AETPOP) (derived)
-0 Á÷¾÷ °ü·ÃµÇÁö ¾ÊÀº ÀÌÀ¯·Î Çü½Ä/ºñÇü½Ä ¼ºÀÎ±³À°¹×ÈÆ·Ã¿¡ Âü¿©ÇÏÁö ¾ÊÀ½
-1 Á÷¾÷ °ü·ÃµÇÁö ¾ÊÀº ÀÌÀ¯·Î Çü½Ä/ºñÇü½Ä ¼ºÀÎ±³À°¹×ÈÆ·Ã¿¡ Âü¿©ÇÔ
+0 ì§ì—… ê´€ë ¨ë˜ì§€ ì•Šì€ ì´ìœ ë¡œ í˜•ì‹/ë¹„í˜•ì‹ ì„±ì¸êµìœ¡ë°í›ˆë ¨ì— ì°¸ì—¬í•˜ì§€ ì•ŠìŒ not participating
+1 ì§ì—… ê´€ë ¨ë˜ì§€ ì•Šì€ ì´ìœ ë¡œ í˜•ì‹/ë¹„í˜•ì‹ ì„±ì¸êµìœ¡ë°í›ˆë ¨ì— ì°¸ì—¬í•¨ participating
 
 NFEHRS
 Number of hours of participation in non-formal education (derived)
 
 lit_use
-01 ÀüÇô ÇÏÁö ¾ÊÀ½
-02 ¸î ´Ş¿¡ ÇÑ ¹ø
-03 ÇÑ ´Ş¿¡ ÇÑµÎ ¹ø
-04 ÀÏÁÖÀÏ¿¡ ¸î ¹ø, ¸ÅÀÏÀº ¾Æ´Ô
-05 ¸ÅÀÏ
+01 ì „í˜€ í•˜ì§€ ì•ŠìŒ
+02 ëª‡ ë‹¬ì— í•œ ë²ˆ
+03 í•œ ë‹¬ì— í•œë‘ ë²ˆ
+04 ì¼ì£¼ì¼ì— ëª‡ ë²ˆ, ë§¤ì¼ì€ ì•„ë‹˜
+05 ë§¤ì¼
+# It is Likert scale.
+01Not at all
+02once for a few month
+03Once or twice for a month
+04a few times for a week; not everyday
+05everyday
 
 Skill use work - Literacy - Read letters memos or mails
 Skill use work - Literacy - Read directions or instructions
@@ -115,11 +136,17 @@ As part of job, read or use diagrams or schematics - levels collapsed (Trend-IAL
 
 
 num_use
-01 ÀüÇô ÇÏÁö ¾ÊÀ½
-02 ¸î ´Ş¿¡ ÇÑ ¹ø
-03 ÇÑ ´Ş¿¡ ÇÑµÎ ¹ø
-04 ÀÏÁÖÀÏ¿¡ ¸î ¹ø, ¸ÅÀÏÀº ¾Æ´Ô
-05 ¸ÅÀÏ
+01 ì „í˜€ í•˜ì§€ ì•ŠìŒ
+02 ëª‡ ë‹¬ì— í•œ ë²ˆ
+03 í•œ ë‹¬ì— í•œë‘ ë²ˆ
+04 ì¼ì£¼ì¼ì— ëª‡ ë²ˆ, ë§¤ì¼ì€ ì•„ë‹˜
+05 ë§¤ì¼
+# It is Likert scale.
+01Not at all
+02once for a few month
+03Once or twice for a month
+04a few times for a week; not everyday
+05everyday
 
 Skill use work - Numeracy - How often - Calculating costs or budgets
 Skill use work - Numeracy - How often - Use or calculate fractions or %
