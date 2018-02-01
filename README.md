@@ -4,14 +4,16 @@
 **Client**: Hyunok Yoo
 
 **STAT 450**:
-Jingyi Huang - Statistics BSc. Student (Email: kellyhuangubc@gmail.com)
-Zhen Liu - Statistics BSc. Student (Email: liuzheneva529@gmail.com)
-Linda Liu - Statistics BSc. Student (Email: lindaliuubc@gmail.com)
+
+- Jingyi Huang: Statistics BSc. Student (Email: kellyhuangubc@gmail.com)
+- Zhen Liu: Statistics BSc. Student (Email: liuzheneva529@gmail.com)
+- Linda Liu: Statistics BSc. Student (Email: lindaliuubc@gmail.com)
 
 **STAT 550**:
-Hyeongcheol "Tom" Park - Statistics MSc. Student (Email: timeleft01@gmail.com)
-Xinyao Fan - Statistics MSc. Student (Email: xinyaofan@stat.ubc.ca)
-Nikolas Krstic - Statistics MSc. Student (Email: nikolas.krstic@stat.ubc.ca)
+
+- Hyeongcheol "Tom" Park - Statistics MSc. Student (Email: timeleft01@gmail.com)
+- Xinyao Fan - Statistics MSc. Student (Email: xinyaofan@stat.ubc.ca)
+- Nikolas Krstic - Statistics MSc. Student (Email: nikolas.krstic@stat.ubc.ca)
 
 
 ## Brief Summary of Project
