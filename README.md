@@ -1,6 +1,18 @@
-# STAT550
+# STAT 450/550 Project: Skill Use of Senior Workers in South Korea within the Workplace
 ## Group Information
+
+**Client**: Hyunok Yoo
+
+**STAT 450**:
+Jingyi Huang - Statistics BSc. Student (Email: kellyhuangubc@gmail.com)
+Zhen Liu - Statistics BSc. Student (Email: liuzheneva529@gmail.com)
+Linda Liu - Statistics BSc. Student (Email: lindaliuubc@gmail.com)
+
+**STAT 550**:
+Hyeongcheol "Tom" Park - Statistics MSc. Student (Email: timeleft01@gmail.com)
+Xinyao Fan - Statistics MSc. Student (Email: xinyaofan@stat.ubc.ca)
+Nikolas Krstic - Statistics MSc. Student (Email: nikolas.krstic@stat.ubc.ca)
 
 
 ## Brief Summary of Project
-"Rapid ageing" draws more attention of public to old workers, literature shows that older workers still participate in the labor market and aspire to learn and develop their competencies through various types of learning and education. Our project focus on how organizational and learning factors affect older workers’ skill utilization in the workplace in South Korea. Identifying what aspects of older workers affect their skill use is a critical research issue, since the skill use of workers within organizational setting becomes a key asset to improve individual and organizational performance. Our study will use the data from from the open source of the Programme for the International Assessment of Adult Competencies (PIAAC). Based on our research purpose, we restricted the sample to include baby boomers and traditionalists (50-54 and 55-65 years old) who were in employment on the private sector at the time of survey in South Korea. As a result, 1247 (above 50 years old) data set was used for the final analysis. From the data analysis, we expect meaningful findings to apply to the development of adult workers who are agile performers in the workplace organizations. At the same time, we expect our study findings contribute the field of adult education and organization development. 
+A "rapidly aging" population is a phenomena describing the size growth of senior subpopulations. In many nations, the population percentage of seniors has rapidly grown over the past several decades. Recent literature also shows that senior workers continue to participate in the labor market. They often aspire to develop their skills for the work environment, often through various education programs. A key objective of this study is to discern how organizational and learning factors are associated with either skill usage or skill proficiency of senior workers in South Korea. Identifying these factors is a critical research issue, since skill usage of workers is a key area to improve both individual and organizational performance. Our study will use data publicly available from the Programme for the International Assessment of Adult Competencies (PIAAC). The dataset has been restricted to only include baby boomers and traditionalists (50-54 and 55-65 years old) who were employed in the private sector at the time of survey in South Korea. There are a total of 1247 observations within the dataset to be used for our analyses. Most of the variables in the data also fall into one of three categories: "demographic", "organizational" and "educational". We expect any significant findings to contribute to the field of adult education and organization development. 
