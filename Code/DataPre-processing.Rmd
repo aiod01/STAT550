@@ -70,13 +70,13 @@ table(newdata$pub_priv)
 ```
 From the table above, 1062 of the observations are from private sector while 145 of them are from Public sector.
 
-I'll create a dataset called 'data_priv', which only contains the employers in private sector.
+I'll create a dataset called 'data_priv', which only contains the employees in private sector.
 ```{r only priv}
 newdata$pub_priv <- factor(newdata$pub_priv)
 data_priv <- newdata[newdata$pub_priv ==1 & (!is.na(newdata$pub_priv)), ] #1062
 ```
 
-I'll create a dataset called 'data_both', which contains the employers in private sector or in public sector(that is, deleting the rows who have missing value).
+I'll create a dataset called 'data_both', which contains the employees in private sector or in public sector(that is, deleting the rows who have missing value).
 ```{r}
 data_both <- newdata[!is.na(newdata$pub_priv), ] #1207
 ```
