@@ -1,0 +1,41 @@
+
+Dependent variables:
+·  Skill use for work: the frequency of the utilization of certain Numeracy/literacy skills
+ These variables are calculated by taking the average of some sub-items. Theses sub-items are measured by likert scale: 1,2,3,4,5(from not at all to everyday)
+          o   Numeracy[num_use]
+	  o   Literacy[lit_use]
+·  Proficiency test scores: the average test score of Numeracy/Literacy(Continuous)
+	  o    Numeracy[pvnumM]
+	  o    Literacy[pvlitM]
+
+Explanatory Variable:
+ 1)  Demographic factors:
+	o  Age[AGE_R]
+	o  Gender[Gender_R]: 1-male, 2-female
+	o  Education[Education Level]: 1-middle, 2-high, 3-college, 4-graduate     
+	o  Employment type[full_part]: 1-fulltime, 2-part-time
+	o  Work experiences (years) [Year_wl]: continuous
+	o  Public vs. private sector [pub_piv]:  1-private, 2-public
+
+2) Organizational contexts: 
+   
+	o  Work flexibility[work_flexM] -sequence of tasks, how to do the work, speed of work, working hours: continuous
+	o  Learning opportunity[work_lrnM]-learning from peers/supervisors, learning by doing, keeping up to date: continuous
+	o  Managing others (1-yes, 2-no)[Mgr]
+	o  Managing how many (1:10-5, 2:6-10, 3:11-24, 4:25-99, 5:more than 100) [Mgr_c]
+
+3) Learnging/Eduaction:
+	o  Active learning strategies[Act_lrn](6)
+               Averaging sub-items:relate new ideas, learning new things, attribute something new, bottoming of difficult things, fit different ideas together, look additional info(1,2,3,4,5)
+	o  Participation in non-formal education [NFE12]: 0 for not; 1 for yes.
+	o  Participation in formal or non-formal adult education program [FNFAET12]
+	o  Participation in formal or non-formal education(job-related) [FNFET12JR] 
+	o  Participation in formal or non-formal adult education program (job-related)[FNFAET12JR]
+	o  Participation in formal or non-formal adult education program (non job-related)[FNFAET12NJR]
+	o  Number of hours of participation in non-formal education[NFEHRS]: continuous
+
+
+
+
+
+
