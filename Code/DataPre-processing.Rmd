@@ -81,9 +81,6 @@ I'll create a dataset called 'data_both', which contains the employees in privat
 data_both <- newdata[!is.na(newdata$pub_priv), ] #1207
 ```
 
-###
-
-
 
 
 
