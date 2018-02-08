@@ -23,7 +23,7 @@ Explanatory Variable:
 	o  Work flexibility[work_flexM](4) -sequence of tasks, how to do the work, speed of work, working hours
 	o  Learning opportunity[work_lrnM](3)-learning from peers/supervisors, learning by doing, keeping up to date
 	o  Managing others[Mgr]: 1-yes, 2-no
-	o  Managing how many[Mgr_c]: 1:0-5, 2:6-10, 3:11-24, 4:25-99, 5:more than 100
+	o  Managing how many[Mgr_c]: 1:0'-5, 2:6-10, 3:11-24, 4:25-99, 5:more than 100
 
 3) Learnging/Eduaction:
 	o  Active learning strategies[Act_lrn](6)

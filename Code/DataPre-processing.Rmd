@@ -76,12 +76,5 @@ newdata$pub_priv <- factor(newdata$pub_priv)
 data_priv <- newdata[newdata$pub_priv ==1 & (!is.na(newdata$pub_priv)), ] #1062
 ```
 
-I'll create a dataset called 'data_both', which contains the employees in private sector or in public sector(that is, deleting the rows who have missing value).
-```{r}
-data_both <- newdata[!is.na(newdata$pub_priv), ] #1207
-```
-
-
-
 
 
