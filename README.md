@@ -4,7 +4,7 @@
 [Final Proposal](https://github.com/aiod01/STAT550-450-for-Seniorworkers-from-Korea/blob/master/Documents/Proposal/FinalProposal.docx)
 
 
-**Client**: Hyunok Yoo
+**Client**: Hyunok Ryu
 
 **STAT 450**:
 
