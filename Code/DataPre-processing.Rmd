@@ -6,6 +6,7 @@ output: html_document
 ---
 
 ```{r data input}
+setwd("~/Desktop/stat450/seniorworkers/senior worker/Code")
 library(haven)
 Rawdata<- read_sav("~/Desktop/stat450/seniorworkers/senior worker/Data/Data-NFEHRS_revised.sav")  #1247
 ```
@@ -13,9 +14,9 @@ Rawdata<- read_sav("~/Desktop/stat450/seniorworkers/senior worker/Data/Data-NFEH
 ### 1. Check Response
 ```{r response skil_num}
 summary(Rawdata$num_use)
-nrow(Rawdata[Rawdata$num_use==7,])  ##why there is a '7'....????
+nrow(Rawdata[Rawdata$num_use==7,])  
 ```
-The max of num_use is 5 so I guessed 7 may be a wrong input. After delete this observation(num_use=7):
+The max of num_use is 5 so I guessed 7 may be a wrong input. Also, there are other four missing value in this observation.Therefore, we'll use the dataset that exclude this observation(num_use=7):
 ```{r responses qqplot }
 newdata<- Rawdata[Rawdata$num_use!=7,]  #1246
 par(mfrow=c(2,2))
@@ -54,12 +55,14 @@ nrow(newdata[is.na(newdata$ED_Level),]) #0
 nrow(newdata[is.na(newdata$EMPloyed),]) #0
 nrow(newdata[is.na(newdata$Full_part),]) #0
 nrow(newdata[is.na(newdata$Years_wk),]) #0
-nrow(newdata[is.na(newdata$pub_priv),]) #39
+nrow(newdata[is.na(newdata$work_flexM),]) #0
+nrow(newdata[is.na(newdata$work_lrnM),]) #0
+nrow(newdata[is.na(newdata$pub_priv),]) #40
 nrow(newdata[is.na(newdata$NFE12),]) #0
 nrow(newdata[is.na(newdata$FNFAET12),]) #0
 nrow(newdata[is.na(newdata$FNFE12JR),]) #0
 nrow(newdata[is.na(newdata$FNFAET12JR),]) #0
-nrow(newdata[is.na(newdata$FNFAET12NJR),]) #0
+nrow(newdata[is.na(newwdata$FNFAET12NJR),]) #0
 nrow(newdata[is.na(newdata$NFEHRS),]) #0
 ```
 There are 501 missing value in the 'Mgr' column, which is more than 40% of the total number of the observations. I would suggest that progressing our regression analysis without this variable first. 
@@ -75,6 +78,19 @@ I'll create a dataset called 'data_priv', which only contains the employees in p
 newdata$pub_priv <- factor(newdata$pub_priv)
 data_priv <- newdata[newdata$pub_priv ==1 & (!is.na(newdata$pub_priv)), ] #1062
 ```
+
+
+
+### 4. Correlations
+```{r}
+newdata.numeric<-newdata[,c("AGE_R","Years_wk","work_flexM","work_lrnM","act_lrn",
+                            "NFEHRS","pvlitM","pvnumM")]
+
+cor(newdata.numeric)
+
+```
+
+
 
 
 
