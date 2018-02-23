@@ -1,5 +1,5 @@
 ---
-title: "Code"
+title: "Senior Worker 450 Code"
 author: "Zhen Liu, Yutong Liu, Jingyi Huang"
 date: "2018/2/1"
 output: html_document
@@ -17,7 +17,7 @@ Rawdata<- read_sav("~/Desktop/stat450/seniorworkers/senior worker/Data/Data-NFEH
 summary(Rawdata$num_use)
 nrow(Rawdata[Rawdata$num_use==7,])  
 ```
-The max of num_use is 5 so I guessed 7 may be a wrong input. Also, there are other four missing value in this observation.Therefore, we'll use the dataset that exclude this observation(num_use=7):
+The max of num_use is 5 so I guessed 7 may be a wrong input. Also, there are other four missing value in this observation.Therefore, we'll use the dataset that exclude this obervation. observation(num_use=7):
 ```{r responses qqplot }
 newdata<- Rawdata[Rawdata$num_use!=7,]  #1246
 par(mfrow=c(2,2))
@@ -48,7 +48,7 @@ The top left and top right Q-Q plot are not on a straight line. We might need so
 The bottom left and bottom right Q-Q plot seem on a straight line so it is fair to say that the two responses(pvnumM, pvlitM) of our sample are normal distributed. The assumption of linear regression is statisfied.
 
 
-### 2. Missing Value
+### 2. Check Missing Value
 ```{r results= 'hide'}
 nrow(newdata[is.na(newdata$Mgr),]) #501
 nrow(newdata[is.na(newdata$GENDER_R),]) #0
@@ -65,6 +65,7 @@ nrow(newdata[is.na(newdata$FNFE12JR),]) #0
 nrow(newdata[is.na(newdata$FNFAET12JR),]) #0
 nrow(newdata[is.na(newwdata$FNFAET12NJR),]) #0
 nrow(newdata[is.na(newdata$NFEHRS),]) #0
+
 ```
 There are 501 missing value in the 'Mgr' column, which is more than 40% of the total number of the observations. I would suggest that progressing our regression analysis without this variable first. 
 
@@ -72,17 +73,16 @@ There are 39 missing value in the 'pub_priv'.
 ```{r pub_priv}
 table(newdata$pub_priv)
 ```
-From the table above, 1062 of the observations are from private sector while 145 of them are from Public sector.
+From the table above, 1062 of the observations are from private sector while 145 of them are from Public sector. 
 
 ### 3.Check Variable
 ```{r}
-##ED_Level
+##1.ED_Level
 unique(newdata$ED_Level)
 nrow(newdata[newdata$ED_Level == 8,]) #only one observation, changes it to 4
 newdata<- within(newdata, ED_Level[ED_Level==8]<-4 )
 
-
-## categorical variable
+##2.Categorical variable
 newdata$pub_priv <- factor(newdata$pub_priv)
 newdata$GENDER_R <- as.factor(newdata$GENDER_R)
 newdata$ED_Level <- as.factor(newdata$ED_Level)
@@ -92,11 +92,20 @@ newdata$FNFE12JR <- as.factor(newdata$FNFE12JR)
 newdata$FNFAET12NJR <- as.factor(newdata$FNFAET12NJR)
 newdata$FNFAET12JR <- as.factor(newdata$FNFAET12JR)
 
-##
-table(data_priv$FNFE12JR == data_priv$FNFAET12JR)
-####They are exactly the same: use one of them
+##3. "FNFAET12" "FNFAET12JR" "FNFAET12NJR" t-test:
+#1)pvlitM
+t.test(pvlitM~FNFAET12, data = newdata) #p-value < 2.2e-16
+t.test(pvlitM~FNFAET12JR, data = newdata) #p-value = 9.813e-13
+t.test(pvlitM~FNFAET12NJR, data = newdata) #p-value = 0.0001315
 
-##
+#2)pvnumM
+t.test(pvnumM~FNFAET12, data = newdata) #p-value < 2.2e-16
+t.test(pvnumM~FNFAET12JR, data = newdata) #p-value < 2.2e-16
+t.test(pvnumM~FNFAET12NJR, data = newdata) #p-value = 6.66e-06
+##they are all statistically significant and FNFAET12 is the union of other two variables.
+
+##4.FNFE12JR and FNFAET12JR
+table(data_priv$FNFE12JR == data_priv$FNFAET12JR)##They are exactly the same: use one of them
 
 
 ```
@@ -202,8 +211,8 @@ step(null.lit,scope = list(lower=null.lit,upper=full.lit),
 I'll create a dataset called 'data_priv', which only contains the employees in private sector.
 ```{r only priv}
 data_priv <- newdata[newdata$pub_priv ==1 & (!is.na(newdata$pub_priv)), ] #1062
-data_priv_lit<- data_priv[,c(-3,-4,-6,-8,-10,-11,-12,-15,-16,-19,-21,-22)] 
-data_priv_num<- data_priv[,c(-3,-4,-6,-8,-10,-11,-12,-15,-16,-18,-21,-22)]
+data_priv_lit<- data_priv[,c(-3,-4,-6,-8,-10,-11,-12,-15,-16,-19,-22)] 
+data_priv_num<- data_priv[,c(-3,-4,-6,-8,-10,-11,-12,-15,-16,-18,-22)]
 
 ```
 
