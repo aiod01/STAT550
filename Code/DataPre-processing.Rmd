@@ -1,6 +1,6 @@
 ---
-title: "Data Pre-processing"
-author: "Zhen Liu"
+title: "Code"
+author: "Zhen Liu, Yutong Liu, Jingyi Huang"
 date: "2018/2/1"
 output: html_document
 ---
@@ -11,6 +11,7 @@ library(haven)
 Rawdata<- read_sav("~/Desktop/stat450/seniorworkers/senior worker/Data/Data-NFEHRS_revised.sav")  #1247
 ```
 
+## 1. Date Pre-precessing
 ### 1. Check Response
 ```{r response skil_num}
 summary(Rawdata$num_use)
@@ -73,24 +74,154 @@ table(newdata$pub_priv)
 ```
 From the table above, 1062 of the observations are from private sector while 145 of them are from Public sector.
 
-I'll create a dataset called 'data_priv', which only contains the employees in private sector.
-```{r only priv}
+### 3.Check Variable
+```{r}
+##ED_Level
+unique(newdata$ED_Level)
+nrow(newdata[newdata$ED_Level == 8,]) #only one observation, changes it to 4
+newdata<- within(newdata, ED_Level[ED_Level==8]<-4 )
+
+
+## categorical variable
 newdata$pub_priv <- factor(newdata$pub_priv)
-data_priv <- newdata[newdata$pub_priv ==1 & (!is.na(newdata$pub_priv)), ] #1062
+newdata$GENDER_R <- as.factor(newdata$GENDER_R)
+newdata$ED_Level <- as.factor(newdata$ED_Level)
+newdata$Full_part <- as.factor(newdata$Full_part)
+newdata$NFE12 <- as.factor(newdata$NFE12)
+newdata$FNFE12JR <- as.factor(newdata$FNFE12JR)
+newdata$FNFAET12NJR <- as.factor(newdata$FNFAET12NJR)
+newdata$FNFAET12JR <- as.factor(newdata$FNFAET12JR)
+
+##
+table(data_priv$FNFE12JR == data_priv$FNFAET12JR)
+####They are exactly the same: use one of them
+
+##
+
+
 ```
-
-
-
 ### 4. Correlations
 ```{r}
 newdata.numeric<-newdata[,c("AGE_R","Years_wk","work_flexM","work_lrnM","act_lrn",
                             "NFEHRS","pvlitM","pvnumM")]
-
 cor(newdata.numeric)
+```
 
+
+## 3. Methods
+### 1. ANOVA
+```{r}
+# pvlitM vs gender
+boxplot(pvlitM~GENDER_R,data=newdata, main="gender vs pvlitM", 
+      xlab="gender", ylab="literacy score")
+summary(aov(pvlitM~GENDER_R,data=newdata))
+
+# pvlitM vs age
+newdata$age_cat <-cut(newdata$AGE_R, c(49,55,60,65))
+boxplot(pvlitM~age_cat,data=newdata, main="age vs pvlitM", 
+      xlab="age", ylab="literacy score")
+summary(aov(pvlitM~age_cat,data=newdata))
+
+
+interaction.plot(newdata$GENDER_R, newdata$age_cat, newdata$pvlitM)
+summary(aov(pvlitM~age_cat*GENDER_R,data=newdata))
+
+# pvlitM vs full/part time
+boxplot(pvlitM~Full_part,data=newdata, main="pvlitM vs full/part time", 
+      xlab="full/part time", ylab="literacy score")
+summary(aov(pvlitM~Full_part,data=newdata))
+
+# pvlitM vs education
+boxplot(pvlitM~ED_Level,data=newdata, main="pvlitM vs education", 
+      xlab="education", ylab="literacy score")
+summary(aov(pvlitM~ED_Level,data=newdata))
+
+# pvlitM vs work year
+unique(newdata$Years_wk)
+newdata$Years_wk <-cut(newdata$Years_wk, c(0,10,20,30,40,100), right=FALSE)
+boxplot(pvlitM~Years_wk,data=newdata, main="pvlitM vs work year", 
+      xlab="work year", ylab="literacy score")
+summary(aov(pvlitM~Years_wk,data=newdata))
+
+# pvlitM vs work_flexM
+newdata$flex_cat <-cut(newdata$work_flexM, c(1,2,3,4,6), right=FALSE)
+boxplot(pvlitM~flex_cat,data=newdata, main="pvlitM vs work flexibility", 
+      xlab="work flexibility", ylab="literacy score")
+summary(aov(pvlitM~flex_cat,data=newdata))
+
+# pvlitM vs active learning
+boxplot(pvlitM~act_lrn,data=newdata, main="pvlitM vs active learning", 
+      xlab="active learning", ylab="literacy score")
+summary(aov(pvlitM~act_lrn,data=newdata))
+
+# pvlitM vs private/public
+boxplot(pvlitM~Full_part,data=newdata, main="pvlitM vs private/public sector", 
+      xlab="private/public sector", ylab="literacy score")
+summary(aov(pvlitM~Full_part,data=newdata))
+
+# pvlitM vs None formal education
+boxplot(pvlitM~NFE12,data=newdata, main="pvlitM vs None formal education", 
+      xlab="None formal education", ylab="literacy score")
+summary(aov(pvlitM~NFE12,data=newdata))
+
+# pvlitM vs adult eduction
+boxplot(pvlitM~FNFAET12,data=newdata, main="pvlitM vs adult eduction", 
+      xlab="adult eduction", ylab="literacy score")
+summary(aov(pvlitM~FNFAET12,data=newdata))
+
+# pvlitM vs adult eduction
+unique(newdata$NFEHRS)
+summary(lm(pvlitM~NFEHRS,data=newdata))
+boxplot(pvlitM~NFEHRS,data=newdata, main="pvlitM vs eductaion", 
+      xlab="adult eduction", ylab="literacy score")
+summary(aov(pvlitM~NFEHRS,data=newdata))
 ```
 
 
 
+### 2. Stepwise AIC & BIC(including priv&public)
+```{r} 
+#literacture:
+data_lit<- newdata[,c(-3,-4,-6,-8,-11,-12,-15,-16,-19,-21,-22)] 
+full.lit<-lm(pvlitM~.,data=data_lit)
+null.lit<-lm(pvlitM~1,data=data_lit)
+step(null.lit,scope = list(lower=null.lit,upper=full.lit),
+     direction="both", criterion = "AIC")
+
+#numberacy:
+data_num<- newdata[,c(-3,-4,-6,-8,-11,-12,-15,-16,-18,-21,-22)]
+full.num<-lm(pvlitM~.,data=data_num)
+null.num<-lm(pvlitM~1,data=data_num)
+step(null.lit,scope = list(lower=null.lit,upper=full.lit),
+     direction="both", criterion = "AIC")
+
+```
 
 
+### 3. Stepwise AIC & BIC(exclude pub_priv)
+I'll create a dataset called 'data_priv', which only contains the employees in private sector.
+```{r only priv}
+data_priv <- newdata[newdata$pub_priv ==1 & (!is.na(newdata$pub_priv)), ] #1062
+data_priv_lit<- data_priv[,c(-3,-4,-6,-8,-10,-11,-12,-15,-16,-19,-21,-22)] 
+data_priv_num<- data_priv[,c(-3,-4,-6,-8,-10,-11,-12,-15,-16,-18,-21,-22)]
+
+```
+
+```{r stepAIC}
+##numeracy
+null.priv.num <- lm(pvnumM~1,data = data_priv_num)
+full.priv.num <- lm(pvnumM~.,data = data_priv_num)
+library(MASS)
+step(null.priv.num, scope = list(lower=null.priv.num,upper=full.priv.num),
+     direction="both", criterion = "AIC",trace = F)  #ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS
+step(null.priv.num, scope = list(lower=null.priv.num,upper=full.priv.num),
+     direction="both", criterion = "BIC",k=log(nrow(data_priv_num)),trace = F)#ED_level, act_lrn,Age,Gender
+
+#Literacy
+null.priv.lit<- lm(pvlitM~1,data=data_priv_lit)
+full.priv.lit<- lm(pvlitM~.,data=data_priv_lit)
+step(null.priv.lit, scope = list(lower=null.priv.lit,upper=full.priv.lit),
+     direction="both", criterion = "AIC",trace = F)  #ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS
+step(null.priv.lit, scope = list(lower=null.priv.lit,upper=full.priv.lit),
+     direction="both", criterion = "BIC",k=log(nrow(data_priv_lit)),trace = F) #ED_Level, act_lrn, 
+```
