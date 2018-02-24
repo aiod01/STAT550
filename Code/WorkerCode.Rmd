@@ -65,7 +65,7 @@ nrow(newdata[is.na(newdata$NFE12),]) #0
 nrow(newdata[is.na(newdata$FNFAET12),]) #0
 nrow(newdata[is.na(newdata$FNFE12JR),]) #0
 nrow(newdata[is.na(newdata$FNFAET12JR),]) #0
-nrow(newdata[is.na(newwdata$FNFAET12NJR),]) #0
+nrow(newdata[is.na(newdata$FNFAET12NJR),]) #0
 nrow(newdata[is.na(newdata$NFEHRS),]) #0
 
 ```
@@ -111,6 +111,7 @@ table(data_priv$FNFE12JR == data_priv$FNFAET12JR)##They are exactly the same: us
 
 
 ```
+
 ### 4. Correlations
 ```{r}
 newdata.numeric<-newdata[,c("AGE_R","Years_wk","work_flexM","work_lrnM","act_lrn",
@@ -149,11 +150,10 @@ boxplot(pvlitM~ED_Level,data=newdata, main="pvlitM vs education",
 summary(aov(pvlitM~ED_Level,data=newdata))
 
 # pvlitM vs work year
-unique(newdata$Years_wk)
-newdata$Years_wk <-cut(newdata$Years_wk, c(0,10,20,30,40,100), right=FALSE)
-boxplot(pvlitM~Years_wk,data=newdata, main="pvlitM vs work year", 
+newdata$Years_wk_cat <-cut(newdata$Years_wk, c(0,10,20,30,40,100), right=FALSE)
+boxplot(pvlitM~Years_wk_cat,data=newdata, main="pvlitM vs work year", 
       xlab="work year", ylab="literacy score")
-summary(aov(pvlitM~Years_wk,data=newdata))
+summary(aov(pvlitM~Years_wk_cat,data=newdata))
 
 # pvlitM vs work_flexM
 newdata$flex_cat <-cut(newdata$work_flexM, c(1,2,3,4,6), right=FALSE)
@@ -217,11 +217,9 @@ boxplot(pvnumM~ED_Level,data=newdata, main="pvnumM vs education",
 summary(aov(pvnumM~ED_Level,data=newdata))
 
 # pvnum vs work year
-unique(newdata$Years_wk)
-newdata$Years_wk <-cut(newdata$Years_wk, c(0,10,20,30,40,100), right=FALSE)
-boxplot(pvnumM~Years_wk,data=newdata, main="pvnumM vs work year", 
+boxplot(pvnumM~Years_wk_cat,data=newdata, main="pvnumM vs work year", 
       xlab="work year", ylab="numeracy score")
-summary(aov(pvnumM~Years_wk,data=newdata))
+summary(aov(pvnumM~Years_wk_cat,data=newdata))
 ```
 
 
@@ -277,4 +275,16 @@ step(null.priv.lit, scope = list(lower=null.priv.lit,upper=full.priv.lit), direc
 #BIC
 step(null.priv.lit, scope =list(lower=null.priv.lit,upper=full.priv.lit),direction="both", criterion = "BIC",k=log(nrow(data_priv_lit)),trace = F) #ED_Level, act_lrn, 
 ```
+### 3-5. Model comparison
+
+```{r}
+##1)numeracy:
+lm.num.without<-lm(pvnumM ~ ED_Level + act_lrn + AGE_R + GENDER_R + 
+    work_flexM + NFEHRS, data = data_num)
+lm.num.with<-lm(pvnumM ~ ED_Level + act_lrn + AGE_R + GENDER_R + 
+    work_flexM + NFEHRS + pub_priv, data = data_num)
+anova(lm.num.without,lm.num.with)
+```
+
+
 
