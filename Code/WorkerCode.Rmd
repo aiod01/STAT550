@@ -227,17 +227,27 @@ summary(aov(pvnumM~Years_wk,data=newdata))
 
 ### 3-3.Stepwise AIC & BIC(including priv&public)
 ```{r}
-#literacture:
-data_lit<- newdata[,c(-3,-4,-6,-8,-11,-12,-15,-16,-19,-21,-22)] 
-full.lit<-lm(pvlitM~.,data=data_lit)
-null.lit<-lm(pvlitM~1,data=data_lit)
-step(null.lit,scope = list(lower=null.lit,upper=full.lit),direction="both", criterion = "AIC")
-
 #numeracy:
 data_num<- newdata[,c(-3,-4,-6,-8,-11,-12,-15,-16,-18,-21,-22)]
-full.num<-lm(pvlitM~.,data=data_num)
-null.num<-lm(pvlitM~1,data=data_num)
-step(null.lit,scope = list(lower=null.lit,upper=full.lit), direction="both", criterion = "AIC")
+data_num<- na.omit(data_num) #1207
+full.num<-lm(pvnumM~.,data=data_num)
+null.num<-lm(pvnumM~1,data=data_num)
+step(null.lit,scope = list(lower=null.lit,upper=full.lit), direction="both", criterion = 
+       "AIC", trace = F)   #ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS, public/private
+step(null.lit,scope = list(lower=null.lit,upper=full.lit), direction="both", criterion = 
+       "BIC", trace = F, k=log(nrow(data_num))) #ED_level, act_ln
+
+#literacture:
+data_lit<- newdata[,c(-3,-4,-6,-8,-11,-12,-15,-16,-19,-21,-22)] 
+data_lit<- na.omit(data_lit) #1207
+full.lit<-lm(pvlitM~.,data=data_lit)
+null.lit<-lm(pvlitM~1,data=data_lit)
+step(null.lit,scope = list(lower=null.lit,upper=full.lit),direction="both", criterion = 
+      "AIC", trace = F)#ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS, public/private
+step(null.lit,scope = list(lower=null.lit,upper=full.lit),direction="both", criterion = 
+       "BIC", trace = F,k=log(nrow(data_lit))) #ED_Level, act_lrn
+
+
 ```
 
 ### 3-4. Stepwise AIC & BIC(exclude pub_priv)
