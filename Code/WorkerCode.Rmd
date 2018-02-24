@@ -65,7 +65,7 @@ nrow(newdata[is.na(newdata$NFE12),]) #0
 nrow(newdata[is.na(newdata$FNFAET12),]) #0
 nrow(newdata[is.na(newdata$FNFE12JR),]) #0
 nrow(newdata[is.na(newdata$FNFAET12JR),]) #0
-nrow(newdata[is.na(newwdata$FNFAET12NJR),]) #0
+nrow(newdata[is.na(newdata$FNFAET12NJR),]) #0
 nrow(newdata[is.na(newdata$NFEHRS),]) #0
 
 ```
@@ -149,11 +149,10 @@ boxplot(pvlitM~ED_Level,data=newdata, main="pvlitM vs education",
 summary(aov(pvlitM~ED_Level,data=newdata))
 
 # pvlitM vs work year
-unique(newdata$Years_wk)
-newdata$Years_wk <-cut(newdata$Years_wk, c(0,10,20,30,40,100), right=FALSE)
-boxplot(pvlitM~Years_wk,data=newdata, main="pvlitM vs work year", 
+newdata$Years_wk_cat <-cut(newdata$Years_wk, c(0,10,20,30,40,100), right=FALSE)
+boxplot(pvlitM~Years_wk_cat,data=newdata, main="pvlitM vs work year", 
       xlab="work year", ylab="literacy score")
-summary(aov(pvlitM~Years_wk,data=newdata))
+summary(aov(pvlitM~Years_wk_cat,data=newdata))
 
 # pvlitM vs work_flexM
 newdata$flex_cat <-cut(newdata$work_flexM, c(1,2,3,4,6), right=FALSE)
@@ -217,11 +216,9 @@ boxplot(pvnumM~ED_Level,data=newdata, main="pvnumM vs education",
 summary(aov(pvnumM~ED_Level,data=newdata))
 
 # pvnum vs work year
-unique(newdata$Years_wk)
-newdata$Years_wk <-cut(newdata$Years_wk, c(0,10,20,30,40,100), right=FALSE)
-boxplot(pvnumM~Years_wk,data=newdata, main="pvnumM vs work year", 
+boxplot(pvnumM~Years_wk_cat,data=newdata, main="pvnumM vs work year", 
       xlab="work year", ylab="numeracy score")
-summary(aov(pvnumM~Years_wk,data=newdata))
+summary(aov(pvnumM~Years_wk_cat,data=newdata))
 ```
 
 
