@@ -6,9 +6,11 @@ output: html_document
 ---
 
 ```{r data input}
-setwd("~/Desktop/stat450/seniorworkers/senior worker/Code")
+s<-getwd()
+substr(s, 1, nchar(s)-4)
+path<-paste(substr(s, 1, nchar(s)-4),"Data/Data-NFEHRS_revised.sav",sep = "")
 library(haven)
-Rawdata<- read_sav("~/Desktop/courses/stat450/oldworkers/Data/Data-NFEHRS_revised.sav")  #1247
+Rawdata<- read_sav(path)  #1247
 ```
 
 ### 1. Check Response
@@ -79,6 +81,7 @@ newdata$pub_priv <- factor(newdata$pub_priv)
 data_priv <- newdata[newdata$pub_priv ==1 & (!is.na(newdata$pub_priv)), ] #1062
 ```
 
+### 3-1. ANOVA for pvlitM
 ```{r}
 #anova
 # pvlitM vs gender
@@ -147,6 +150,73 @@ boxplot(pvlitM~NFEHRS,data=newdata, main="pvlitM vs eductaion",
 summary(aov(pvlitM~NFEHRS,data=newdata))
 ```
 
+### 3-2. ANOVA for pvnum
+```{r}
+# pvnum vs gender
+boxplot(pvnumM~GENDER_R,data=newdata, main="gender vs pvnum", 
+      xlab="gender", ylab="numeracy score")
+summary(aov(pvnumM~GENDER_R,data=newdata))
+
+# pvnum vs age
+newdata$age_cat <-cut(newdata$AGE_R, c(49,55,60,65))
+boxplot(pvnumM~age_cat,data=newdata, main="age vs pvnumM", 
+      xlab="age", ylab="numeracy score")
+summary(aov(pvnumM~age_cat,data=newdata))
+
+
+interaction.plot(newdata$GENDER_R, newdata$age_cat, newdata$pvnumM)
+summary(aov(pvnumM~age_cat*GENDER_R,data=newdata))
+
+# pvnum vs full/part time
+boxplot(pvnumM~Full_part,data=newdata, main="pvnumM vs full/part time", 
+      xlab="full/part time", ylab="numeracy score")
+summary(aov(pvnumM~Full_part,data=newdata))
+
+# pvnum vs education
+boxplot(pvnumM~ED_Level,data=newdata, main="pvnumM vs education", 
+      xlab="education", ylab="numeracy score")
+summary(aov(pvnumM~ED_Level,data=newdata))
+
+# pvnum vs work year
+unique(newdata$Years_wk)
+newdata$Years_wk <-cut(newdata$Years_wk, c(0,10,20,30,40,100), right=FALSE)
+boxplot(pvnumM~Years_wk,data=newdata, main="pvnumM vs work year", 
+      xlab="work year", ylab="numeracy score")
+summary(aov(pvnumM~Years_wk,data=newdata))
+
+# pvnum vs work_flexM
+newdata$flex_cat <-cut(newdata$work_flexM, c(1,2,3,4,6), right=FALSE)
+boxplot(pvnumM~flex_cat,data=newdata, main="pvnumM vs work flexibility", 
+      xlab="work flexibility", ylab="numeracy score")
+summary(aov(pvnumM~flex_cat,data=newdata))
+
+# pvnum vs active learning
+boxplot(pvnumM~act_lrn,data=newdata, main="pvnumM vs active learning", 
+      xlab="active learning", ylab="numeracy score")
+summary(aov(pvnumM~act_lrn,data=newdata))
+
+# pvnum vs private/public
+boxplot(pvnumM~Full_part,data=newdata, main="pvnumM vs private/public sector", 
+      xlab="private/public sector", ylab="numeracy score")
+summary(aov(pvnumM~Full_part,data=newdata))
+
+# pvnum vs None formal education
+boxplot(pvnumM~NFE12,data=newdata, main="pvnumM vs None formal education", 
+      xlab="None formal education", ylab="numeracy score")
+summary(aov(pvnumM~NFE12,data=newdata))
+
+# pvnum vs adult eduction
+boxplot(pvnumM~FNFAET12,data=newdata, main="pvnumM vs adult eduction", 
+      xlab="adult eduction", ylab="literacy score")
+summary(aov(pvnumM~FNFAET12,data=newdata))
+
+# pvnum vs adult eduction
+unique(newdata$NFEHRS)
+summary(lm(pvnumM~NFEHRS,data=newdata))
+boxplot(pvnumM~NFEHRS,data=newdata, main="pvnumM vs eductaion", 
+      xlab="adult eduction", ylab="literacy score")
+summary(aov(pvnumM~NFEHRS,data=newdata))
+```
 
 ### 4. Correlations
 ```{r}
