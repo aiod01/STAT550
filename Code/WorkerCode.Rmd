@@ -107,7 +107,15 @@ t.test(pvnumM~FNFAET12NJR, data = newdata) #p-value = 6.66e-06
 ##they are all statistically significant and FNFAET12 is the union of other two variables.
 
 ##4.FNFE12JR and FNFAET12JR
-table(data_priv$FNFE12JR == data_priv$FNFAET12JR)##They are exactly the same: use one of them
+table(newdata$FNFE12JR == newdata$FNFAET12JR) #They are exactly the same: use one of them
+
+##Two dataset:
+#1) proficiency test score(numeracy) + possbile factor
+data_num<- newdata[,c(-3,-4,-6,-8,-11,-12,-15,-16,-18,-21,-22)]
+data_num<- na.omit(data_num) #1207
+#2) proficiency test score(literacy) + possbile factor
+data_lit<- newdata[,c(-3,-4,-6,-8,-11,-12,-15,-16,-19,-21,-22)] 
+data_lit<- na.omit(data_lit) #1207
 
 
 ```
@@ -225,9 +233,7 @@ summary(aov(pvnumM~Years_wk_cat,data=newdata))
 
 ### 3-3.Stepwise AIC & BIC(including priv&public)
 ```{r}
-#numeracy:
-data_num<- newdata[,c(-3,-4,-6,-8,-11,-12,-15,-16,-18,-21,-22)]
-data_num<- na.omit(data_num) #1207
+#numeracy: use data_num
 full.num<-lm(pvnumM~.,data=data_num)
 null.num<-lm(pvnumM~1,data=data_num)
 step(null.num,scope = list(lower=null.num,upper=full.num), direction="both", criterion 
@@ -236,9 +242,7 @@ step(null.num,scope = list(lower=null.num,upper=full.num), direction="both", cri
 step(null.num,scope = list(lower=null.num,upper=full.num), direction="both", criterion 
      = "BIC", trace = F, k=log(nrow(data_num))) #ED_level, act_ln, Age
 
-#literacture:
-data_lit<- newdata[,c(-3,-4,-6,-8,-11,-12,-15,-16,-19,-21,-22)] 
-data_lit<- na.omit(data_lit) #1207
+#literacture: use data_lit
 full.lit<-lm(pvlitM~.,data=data_lit)
 null.lit<-lm(pvlitM~1,data=data_lit)
 step(null.lit,scope = list(lower=null.lit,upper=full.lit),direction="both", criterion = 
@@ -251,9 +255,8 @@ step(null.lit,scope = list(lower=null.lit,upper=full.lit),direction="both", crit
 ### 3-4. Stepwise AIC & BIC(exclude pub_priv)
 I'll create a dataset called 'data_priv', which only contains the employees in private sector
 ```{r only priv}
-data_priv <- newdata[newdata$pub_priv ==1 & (!is.na(newdata$pub_priv)), ] #1062
-data_priv_lit<- data_priv[,c(-3,-4,-6,-8,-10,-11,-12,-15,-16,-19,-22)] 
-data_priv_num<- data_priv[,c(-3,-4,-6,-8,-10,-11,-12,-15,-16,-18,-22)]
+data_priv_lit<- data_lit[data_lit$pub_priv ==1 & (!is.na(data_lit$pub_priv)), ][,-6]
+data_priv_num<- data_num[data_num$pub_priv ==1 & (!is.na(data_num$pub_priv)), ][,-6]
 
 ##1)numeracy
 null.priv.num <- lm(pvnumM~1,data = data_priv_num)
@@ -262,7 +265,6 @@ library(MASS)
 #AIC
 (step(null.priv.num, scope = list(lower=null.priv.num,upper=full.priv.num), direction="both", criterion = "AIC",trace = F))$coefficients  
 #ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS
-
 
 #BIC
 (step(null.priv.num, scope = list(lower=null.priv.num,upper=full.priv.num), direction="both", criterion = "BIC",k=log(nrow(data_priv_num)),trace = F))$coefficients
@@ -276,7 +278,6 @@ full.priv.lit<- lm(pvlitM~.,data=data_priv_lit)
 #AIC
 (step(null.priv.lit, scope = list(lower=null.priv.lit,upper=full.priv.lit), direction="both", criterion = "AIC",trace = F))$coefficients  
 #ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS
-
 
 #BIC
 (step(null.priv.lit, scope =list(lower=null.priv.lit,upper=full.priv.lit),direction="both", criterion = "BIC",k=log(nrow(data_priv_lit)),trace = F))$coefficients
