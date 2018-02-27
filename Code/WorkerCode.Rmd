@@ -6,12 +6,21 @@ output: html_document
 ---
 
 ```{r data input}
-s<-getwd()
-substr(s, 1, nchar(s)-4)
-path<-paste(substr(s, 1, nchar(s)-4),"Data/Data-NFEHRS_revised.sav",sep = "")
-library(haven)
-Rawdata<- read_sav(path)  #1247
+#s<-getwd()
+#substr(s, 1, nchar(s)-4)
+#path<-paste(substr(s, 1, nchar(s)-4),"Data/Data-NFEHRS_revised.sav",sep = "")
+#library(haven)
+#Rawdata<- read_sav(path)  #1247
 ```
+
+```{r}
+setwd("/Users/kellyhuang/Desktop")
+getwd()
+#install.packages("haven")
+library(haven)
+Rawdata <- haven::read_sav("Data-NFEHRS_revised.sav")
+```
+
 
 ## Data Pre-processing
 ### 1. Check Response
@@ -230,10 +239,11 @@ data_num<- newdata[,c(-3,-4,-6,-8,-11,-12,-15,-16,-18,-21,-22)]
 data_num<- na.omit(data_num) #1207
 full.num<-lm(pvnumM~.,data=data_num)
 null.num<-lm(pvnumM~1,data=data_num)
-step(null.lit,scope = list(lower=null.lit,upper=full.lit), direction="both", criterion = 
-       "AIC", trace = F)   #ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS, public/private
-step(null.lit,scope = list(lower=null.lit,upper=full.lit), direction="both", criterion = 
-       "BIC", trace = F, k=log(nrow(data_num))) #ED_level, act_ln
+step(null.lit,scope = list(lower=null.lit,upper=full.lit), direction="both", criterion 
+     = "AIC", trace = F)   #ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS, public/private
+
+step(null.lit,scope = list(lower=null.lit,upper=full.lit), direction="both", criterion 
+     = "BIC", trace = F, k=log(nrow(data_num))) #ED_level, act_ln
 
 #literacture:
 data_lit<- newdata[,c(-3,-4,-6,-8,-11,-12,-15,-16,-19,-21,-22)] 
@@ -241,9 +251,17 @@ data_lit<- na.omit(data_lit) #1207
 full.lit<-lm(pvlitM~.,data=data_lit)
 null.lit<-lm(pvlitM~1,data=data_lit)
 step(null.lit,scope = list(lower=null.lit,upper=full.lit),direction="both", criterion = 
-      "AIC", trace = F)#ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS, public/private
+      "AIC", trace = F)#ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS,public/private
+
 step(null.lit,scope = list(lower=null.lit,upper=full.lit),direction="both", criterion = 
        "BIC", trace = F,k=log(nrow(data_lit))) #ED_Level, act_lrn
+
+lm1<-lm(formula = pvlitM ~ ED_Level + act_lrn + age_cat + work_flexM + 
+    pub_priv + GENDER_R + NFEHRS, data = data_lit)
+
+lm2<-lm(formula = pvlitM ~ ED_Level + act_lrn + age_cat + work_flexM + GENDER_R + NFEHRS, data = data_lit)
+
+anova(lm1,lm2) # p-value=0.01978, we confirm that pub/private sector is significant.
 
 
 ```
@@ -277,14 +295,21 @@ step(null.priv.lit, scope =list(lower=null.priv.lit,upper=full.priv.lit),directi
 ```
 ### 3-5. Model comparison
 
-```{r}
+```{r numeracy}
 ##1)numeracy:
 lm.num.without<-lm(pvnumM ~ ED_Level + act_lrn + AGE_R + GENDER_R + 
     work_flexM + NFEHRS, data = data_num)
 lm.num.with<-lm(pvnumM ~ ED_Level + act_lrn + AGE_R + GENDER_R + 
     work_flexM + NFEHRS + pub_priv, data = data_num)
-anova(lm.num.without,lm.num.with)
+anova(lm.num.without,lm.num.with) # p-value = 0.0037**
 ```
 
+```{r literacy}
+##2)literacy:
+lm.lit.without<-lm(formula = pvlitM ~ ED_Level + act_lrn + AGE_R+ work_flexM + 
+    pub_priv + GENDER_R + NFEHRS, data = data_lit)
 
+lm.lit.with<-lm(formula = pvlitM ~ ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R + NFEHRS, data = data_lit)
 
+anova(lm.lit.without,lm.lit.with) # p-value=0.0185, we confirm that pub/private sector is significant.
+```
