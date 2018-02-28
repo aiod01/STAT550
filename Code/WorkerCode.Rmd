@@ -266,6 +266,7 @@ library(MASS)
 (step(null.priv.num, scope = list(lower=null.priv.num,upper=full.priv.num), direction="both", criterion = "AIC",trace = F))$coefficients  
 #ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS
 
+
 #BIC
 (step(null.priv.num, scope = list(lower=null.priv.num,upper=full.priv.num), direction="both", criterion = "BIC",k=log(nrow(data_priv_num)),trace = F))$coefficients
 #ED_level, act_lrn,Age,Gender
@@ -278,6 +279,7 @@ full.priv.lit<- lm(pvlitM~.,data=data_priv_lit)
 #AIC
 (step(null.priv.lit, scope = list(lower=null.priv.lit,upper=full.priv.lit), direction="both", criterion = "AIC",trace = F))$coefficients  
 #ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS
+
 
 #BIC
 (step(null.priv.lit, scope =list(lower=null.priv.lit,upper=full.priv.lit),direction="both", criterion = "BIC",k=log(nrow(data_priv_lit)),trace = F))$coefficients
@@ -303,4 +305,5 @@ lm.lit.without<-lm(formula = pvlitM ~ ED_Level + act_lrn + AGE_R+ work_flexM +
 lm.lit.with<-lm(formula = pvlitM ~ ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R + NFEHRS, data = data_lit)
 
 anova(lm.lit.without,lm.lit.with)$`Pr(>F)`[2] 
+# p-value = 0.0185**
 ```
