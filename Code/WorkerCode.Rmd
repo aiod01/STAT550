@@ -307,3 +307,35 @@ lm.lit.with<-lm(formula = pvlitM ~ ED_Level + act_lrn + AGE_R + work_flexM + GEN
 anova(lm.lit.without,lm.lit.with)$`Pr(>F)`[2] 
 # p-value = 0.0185**
 ```
+
+# verify the AIC result using anova
+```{r}
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -pub_priv,data=data_num))$`Pr(>F)`[2] 
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -GENDER_R,data=data_num))$`Pr(>F)`[2] 
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -AGE_R,data=data_num))$`Pr(>F)`[2] 
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -ED_Level,data=data_num))$`Pr(>F)`[2] 
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -Full_part,data=data_num))$`Pr(>F)`[2] 
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -Years_wk,data=data_num))$`Pr(>F)`[2] 
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -work_flexM,data=data_num))$`Pr(>F)`[2]
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -act_lrn,data=data_num))$`Pr(>F)`[2] 
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -NFE12,data=data_num))$`Pr(>F)`[2]
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -FNFAET12JR,data=data_num))$`Pr(>F)`[2] 
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -FNFAET12NJR,data=data_num))$`Pr(>F)`[2] 
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -NFEHRS,data=data_num))$`Pr(>F)`[2] 
+```
+pub_priv,GENDER_R,AGE_R,ED_Level,work_flexM,act_lrn,FNFAET12NJR
+```{r}
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -pub_priv,data=data_lit))$`Pr(>F)`[2]  
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -GENDER_R,data=data_lit))$`Pr(>F)`[2] 
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -AGE_R,data=data_lit))$`Pr(>F)`[2] 
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -ED_Level,data=data_lit))$`Pr(>F)`[2] 
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -Full_part,data=data_lit))$`Pr(>F)`[2] 
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -Years_wk,data=data_lit))$`Pr(>F)`[2] 
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -work_flexM,data=data_lit))$`Pr(>F)`[2]
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -act_lrn,data=data_lit))$`Pr(>F)`[2] 
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -NFE12,data=data_lit))$`Pr(>F)`[2]
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -FNFAET12JR,data=data_lit))$`Pr(>F)`[2] 
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -FNFAET12NJR,data=data_lit))$`Pr(>F)`[2] 
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -NFEHRS,data=data_lit))$`Pr(>F)`[2] 
+```
+pub_priv,AGE_R,ED_Level,work_flexM,act_lrn
