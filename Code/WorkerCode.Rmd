@@ -96,14 +96,14 @@ newdata$FNFAET12JR <- as.factor(newdata$FNFAET12JR)
 
 ##3. "FNFAET12" "FNFAET12JR" "FNFAET12NJR" t-test:
 #1)pvlitM
-t.test(pvlitM~FNFAET12, data = newdata) #p-value < 2.2e-16
-t.test(pvlitM~FNFAET12JR, data = newdata) #p-value = 9.813e-13
-t.test(pvlitM~FNFAET12NJR, data = newdata) #p-value = 0.0001315
+t.test(pvlitM~FNFAET12, data = newdata)$p.value #p-value < 2.2e-16
+t.test(pvlitM~FNFAET12JR, data = newdata)$p.value #p-value = 9.813e-13
+t.test(pvlitM~FNFAET12NJR, data = newdata)$p.value #p-value = 0.0001315
 
 #2)pvnumM
-t.test(pvnumM~FNFAET12, data = newdata) #p-value < 2.2e-16
-t.test(pvnumM~FNFAET12JR, data = newdata) #p-value < 2.2e-16
-t.test(pvnumM~FNFAET12NJR, data = newdata) #p-value = 6.66e-06
+t.test(pvnumM~FNFAET12, data = newdata)$p.value #p-value < 2.2e-16
+t.test(pvnumM~FNFAET12JR, data = newdata)$p.value #p-value < 2.2e-16
+t.test(pvnumM~FNFAET12NJR, data = newdata)$p.value #p-value = 6.66e-06
 ##they are all statistically significant and FNFAET12 is the union of other two variables.
 
 ##4.FNFE12JR and FNFAET12JR
@@ -236,20 +236,20 @@ summary(aov(pvnumM~Years_wk_cat,data=newdata))
 #numeracy: use data_num
 full.num<-lm(pvnumM~.,data=data_num)
 null.num<-lm(pvnumM~1,data=data_num)
-step(null.num,scope = list(lower=null.num,upper=full.num), direction="both", criterion 
-     = "AIC", trace = F)   #ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS, public/private
+(step(null.num,scope = list(lower=null.num,upper=full.num), direction="both", criterion 
+     = "AIC", trace = F))$coefficients #ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS, public/private
 
-step(null.num,scope = list(lower=null.num,upper=full.num), direction="both", criterion 
-     = "BIC", trace = F, k=log(nrow(data_num))) #ED_level, act_ln, Age
+(step(null.num,scope = list(lower=null.num,upper=full.num), direction="both", criterion 
+     = "BIC", trace = F, k=log(nrow(data_num))))$coefficients  #ED_level, act_ln, Age
 
 #literacture: use data_lit
 full.lit<-lm(pvlitM~.,data=data_lit)
 null.lit<-lm(pvlitM~1,data=data_lit)
-step(null.lit,scope = list(lower=null.lit,upper=full.lit),direction="both", criterion = 
-      "AIC", trace = F)#ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS,public/private
+(step(null.lit,scope = list(lower=null.lit,upper=full.lit),direction="both", criterion = 
+      "AIC", trace = F))$coefficients #ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS,public/private
 
-step(null.lit,scope = list(lower=null.lit,upper=full.lit),direction="both", criterion = 
-       "BIC", trace = F,k=log(nrow(data_lit))) #ED_Level, act_lrn
+(step(null.lit,scope = list(lower=null.lit,upper=full.lit),direction="both", criterion = 
+       "BIC", trace = F,k=log(nrow(data_lit))))$coefficients  #ED_Level, act_lrn
 ```
 
 ### 3-4. Stepwise AIC & BIC(exclude pub_priv)
@@ -300,14 +300,41 @@ anova(lm.num.without,lm.num.with)$`Pr(>F)`[2]
 ##2)literacy:
 lm.lit.without<-lm(formula = pvlitM ~ ED_Level + act_lrn + AGE_R+ work_flexM + 
     pub_priv + GENDER_R + NFEHRS, data = data_lit)
-
+summary(lm.lit.without)
 lm.lit.with<-lm(formula = pvlitM ~ ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R + NFEHRS, data = data_lit)
 
 anova(lm.lit.without,lm.lit.with)$`Pr(>F)`[2] 
 # p-value = 0.0185**
 ```
 
-2)check FNFAET12NJR for numeracy
+=======
+2) Verify the AIC result using anova
+2)-1: numeracy
+```{r numeracy}
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -pub_priv,data=data_num))$`Pr(>F)`[2] 
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -GENDER_R,data=data_num))$`Pr(>F)`[2] 
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -AGE_R,data=data_num))$`Pr(>F)`[2] 
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -ED_Level,data=data_num))$`Pr(>F)`[2] 
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -Full_part,data=data_num))$`Pr(>F)`[2] 
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -Years_wk,data=data_num))$`Pr(>F)`[2] 
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -work_flexM,data=data_num))$`Pr(>F)`[2]
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -act_lrn,data=data_num))$`Pr(>F)`[2] 
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -NFE12,data=data_num))$`Pr(>F)`[2]
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -FNFAET12JR,data=data_num))$`Pr(>F)`[2] 
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -FNFAET12NJR,data=data_num))$`Pr(>F)`[2] 
+anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -NFEHRS,data=data_num))$`Pr(>F)`[2] 
+```
+pub_priv,GENDER_R,AGE_R,ED_Level,work_flexM,act_lrn,FNFAET12NJR
+
+
+Remark: check NFEHRS for numeracy:
+From ANOVA, its corresponding p-value is 0.085; in least-squared model, its p-value is 0.137 so we would like to delete this variable
+```{r}
+summary(lm.num.with)
+```
+
+
+Remark: check FNFAET12NJR for numeracy
 ```{r}
 lm.num.without2<-lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R+ work_flexM + 
      GENDER_R +pub_priv, data = data_num)
@@ -317,3 +344,25 @@ lm.num.with2<-lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R + work_flexM + GE
 anova(lm.num.without2,lm.num.with2)$`Pr(>F)`[2] 
 # p-value = 0.2962
 ```
+Final model check:
+```{r}
+summary(lm.num.without2) #all p-value < 0.05
+```
+
+2)-1: literacy
+```{r}
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -pub_priv,data=data_lit))$`Pr(>F)`[2]  
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -GENDER_R,data=data_lit))$`Pr(>F)`[2] 
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -AGE_R,data=data_lit))$`Pr(>F)`[2] 
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -ED_Level,data=data_lit))$`Pr(>F)`[2] 
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -Full_part,data=data_lit))$`Pr(>F)`[2] 
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -Years_wk,data=data_lit))$`Pr(>F)`[2] 
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -work_flexM,data=data_lit))$`Pr(>F)`[2]
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -act_lrn,data=data_lit))$`Pr(>F)`[2] 
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -NFE12,data=data_lit))$`Pr(>F)`[2]
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -FNFAET12JR,data=data_lit))$`Pr(>F)`[2] 
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -FNFAET12NJR,data=data_lit))$`Pr(>F)`[2] 
+anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -NFEHRS,data=data_lit))$`Pr(>F)`[2] 
+```
+pub_priv,AGE_R,ED_Level,work_flexM,act_lrn
+
