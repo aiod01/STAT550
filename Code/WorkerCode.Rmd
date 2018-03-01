@@ -266,7 +266,6 @@ library(MASS)
 (step(null.priv.num, scope = list(lower=null.priv.num,upper=full.priv.num), direction="both", criterion = "AIC",trace = F))$coefficients  
 #ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS
 
-
 #BIC
 (step(null.priv.num, scope = list(lower=null.priv.num,upper=full.priv.num), direction="both", criterion = "BIC",k=log(nrow(data_priv_num)),trace = F))$coefficients
 #ED_level, act_lrn,Age,Gender
@@ -286,7 +285,7 @@ full.priv.lit<- lm(pvlitM~.,data=data_priv_lit)
 #ED_Level, act_lrn, 
 ```
 ### 3-5. Model comparison
-
+1) check private/public sector 
 ```{r numeracy}
 ##1)numeracy:
 lm.num.without<-lm(pvnumM ~ ED_Level + act_lrn + AGE_R + GENDER_R + 
@@ -306,4 +305,15 @@ lm.lit.with<-lm(formula = pvlitM ~ ED_Level + act_lrn + AGE_R + work_flexM + GEN
 
 anova(lm.lit.without,lm.lit.with)$`Pr(>F)`[2] 
 # p-value = 0.0185**
+```
+
+2)check FNFAET12NJR for numeracy
+```{r}
+lm.num.without2<-lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R+ work_flexM + 
+     GENDER_R +pub_priv, data = data_num)
+
+lm.num.with2<-lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R +  pub_priv +FNFAET12NJR, data = data_num)
+
+anova(lm.num.without2,lm.num.with2)$`Pr(>F)`[2] 
+# p-value = 0.2962
 ```
