@@ -111,10 +111,10 @@ table(newdata$FNFE12JR == newdata$FNFAET12JR) #They are exactly the same: use on
 
 ##Two dataset:
 #1) proficiency test score(numeracy) + possbile factor
-data_num<- newdata[,c(-3,-4,-6,-8,-11,-12,-15,-16,-18,-21,-22)]
+data_num<- newdata[,c(1,2,5,7,9,10,13,14,17,19,20,23,24,25)]
 data_num<- na.omit(data_num) #1207
 #2) proficiency test score(literacy) + possbile factor
-data_lit<- newdata[,c(-3,-4,-6,-8,-11,-12,-15,-16,-19,-21,-22)] 
+data_lit<- newdata[,c(1,2,5,7,9,10,13,14,17,18,20,23,24,25)]
 data_lit<- na.omit(data_lit) #1207
 
 
@@ -240,7 +240,7 @@ null.num<-lm(pvnumM~1,data=data_num)
      = "AIC", trace = F))$coefficients #ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS, public/private
 
 (step(null.num,scope = list(lower=null.num,upper=full.num), direction="both", criterion 
-     = "BIC", trace = F, k=log(nrow(data_num))))$coefficients  #ED_level, act_ln, Age
+     = "BIC", trace = F, k=log(nrow(data_num))))$coefficients  #ED_Level, act_lrn, Age,pub_priv, GENDER_R 
 
 #literacture: use data_lit
 full.lit<-lm(pvlitM~.,data=data_lit)
@@ -300,7 +300,7 @@ anova(lm.num.without,lm.num.with)$`Pr(>F)`[2]
 ##2)literacy:
 lm.lit.without<-lm(formula = pvlitM ~ ED_Level + act_lrn + AGE_R+ work_flexM + 
     pub_priv + GENDER_R + NFEHRS, data = data_lit)
-summary(lm.lit.without)
+summary(lm.lit.without) 
 lm.lit.with<-lm(formula = pvlitM ~ ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R + NFEHRS, data = data_lit)
 
 anova(lm.lit.without,lm.lit.with)$`Pr(>F)`[2] 
@@ -329,7 +329,7 @@ pub_priv,GENDER_R,AGE_R,ED_Level,work_flexM,act_lrn,FNFAET12NJR
 
 Remark: check NFEHRS for numeracy:
 From ANOVA, its corresponding p-value is 0.085; in least-squared model, its p-value is 0.137 so we would like to delete this variable
-```{r}
+```{r NFEHRS numeracy}
 summary(lm.num.with)
 ```
 
@@ -364,5 +364,26 @@ anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -FNFAET12JR,data=data_lit))$`Pr(>F)
 anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -FNFAET12NJR,data=data_lit))$`Pr(>F)`[2] 
 anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -NFEHRS,data=data_lit))$`Pr(>F)`[2] 
 ```
-pub_priv,AGE_R,ED_Level,work_flexM,act_lrn
+Variables that P-value <0.05: pub_priv,AGE_R,ED_Level,work_flexM,act_lrn
+
+Remark: Check NFEHRS and Gender:  
+```{r NEHRS literacy}
+#ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS(From Stepwise AIC)
+summary(lm.lit.with)
+```
+In this lm model, the p-value of 'GENDER_R' and 'NFEHRS' are larger than 0.05. ANOVA comparison would be used for further model diagonisis.
+
+```{r}
+#NFEHRS
+anova(lm(pvlitM~ED_Level + act_lrn + AGE_R + work_flexM + NFEHRS,data=data_lit),lm(pvlitM~ED_Level + act_lrn + AGE_R + work_flexM, data=data_lit))$`Pr(>F)`[2]   #0.1554
+#Gender
+anova(lm(pvlitM~ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R,data=data_lit),lm(pvlitM~ED_Level + act_lrn + AGE_R + work_flexM, data=data_lit))$`Pr(>F)`[2]   #0.0375
+```
+Final model check:
+```{r}
+lm_lit_final <- lm(pvlitM~ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R, data=data_lit)
+summary(lm_lit_final)
+```
+
+
 
