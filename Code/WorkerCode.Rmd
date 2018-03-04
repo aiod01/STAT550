@@ -52,7 +52,8 @@ The bottom left and bottom right Q-Q plot seem on a straight line so it is fair 
 
 ### 2.Show summary statistics and check Missing Value
 ```{r results= 'hide'}
-summary(newdata)
+sum.data<-summary(newdata)[7,]
+sum.data[!is.na(sum.data)]
 ```
 There are 501 missing value in the 'Mgr' column, which is more than 40% of the total number of the observations. I would suggest that progressing our regression analysis without this variable first. 
 
@@ -118,9 +119,7 @@ catcorrm <- function(categorical, newdata) sapply(categorical, function(y) sappl
 catcorrm(categorical,newdata)
 ```
 
-
-## 3. Methods
-### 3-1. ANOVA for pvlitM
+### 5.1 boxplot visualiztion - pvlitM
 ```{r}
 #anova
 # pvlitM vs gender
@@ -142,27 +141,20 @@ boxplot(pvlitM~NFE12,data=newdata, main="pvlitM vs None formal education", xlab=
 boxplot(pvlitM~FNFAET12,data=newdata, main="pvlitM vs adult eduction", xlab="adult eduction", ylab="literacy score")
 ```
 
-### 3-2. ANOVA for pvnum
+### 5.2 boxplot visualiztion - pvnumM
 ```{r}
 # pvnum vs gender
 boxplot(pvnumM~GENDER_R,data=newdata, main="gender vs pvnum", xlab="gender", ylab="numeracy score")
-
 # pvnum vs full/part time
-boxplot(pvnumM~Full_part,data=newdata, main="pvnumM vs full/part time", 
-      xlab="full/part time", ylab="numeracy score")
-summary(aov(pvnumM~Full_part,data=newdata))
-
+boxplot(pvnumM~Full_part,data=newdata, main="pvnumM vs full/part time", xlab="full/part time", ylab="numeracy score")
 # pvnum vs education
-boxplot(pvnumM~ED_Level,data=newdata, main="pvnumM vs education", 
-      xlab="education", ylab="numeracy score")
-summary(aov(pvnumM~ED_Level,data=newdata))
-
+boxplot(pvnumM~ED_Level,data=newdata, main="pvnumM vs education", xlab="education", ylab="numeracy score")
 # pvnum vs work year
 boxplot(pvnumM~Years_wk_cat,data=newdata, main="pvnumM vs work year", xlab="work year", ylab="numeracy score")
 ```
 
-
-### 3-3.Stepwise AIC & BIC(including priv&public)
+## 3. Methods
+### 3-1.Stepwise AIC & BIC(including priv&public)
 ```{r}
 #numeracy: use data_num
 full.num<-lm(pvnumM~.,data=data_num)
@@ -183,7 +175,7 @@ null.lit<-lm(pvlitM~1,data=data_lit)
        "BIC", trace = F,k=log(nrow(data_lit))))$coefficients  #ED_Level, act_lrn
 ```
 
-### 3-4. Stepwise AIC & BIC(exclude pub_priv)
+### 3-2. Stepwise AIC & BIC(exclude pub_priv)
 I'll create a dataset called 'data_priv', which only contains the employees in private sector
 ```{r only priv}
 data_priv_lit<- data_lit[data_lit$pub_priv ==1 & (!is.na(data_lit$pub_priv)), ][,-6]
@@ -215,7 +207,7 @@ full.priv.lit<- lm(pvlitM~.,data=data_priv_lit)
 (step(null.priv.lit, scope =list(lower=null.priv.lit,upper=full.priv.lit),direction="both", criterion = "BIC",k=log(nrow(data_priv_lit)),trace = F))$coefficients
 #ED_Level, act_lrn, 
 ```
-### 3-5. Model comparison
+### 3-3. Model comparison
 1) check private/public sector 
 ```{r numeracy}
 ##1)numeracy:
@@ -303,7 +295,27 @@ lm_lit_final <- lm(pvlitM~ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R, da
 summary(lm_lit_final)
 ```
 
+##forward AdjR^2
+1) numeracy
+```{r}
+library(leaps)
+options(digits=5)
+adjr_num<-regsubsets(pvnumM~.,data=data_num,nbest=1,method = c("forward"))
+summ.adjr_num<-summary(adjr_num)
+which.max(summ.adjr_num$adjr2)
+summ.adjr_num
+# GENDER_R, AGE_R, ED_Level, pub_priv, work_flexM, act_lrn, FNFAET12NJR, NFEHRS
+```
 
 
+2)literacy 
+
+```{r}
+adjr_lit<-regsubsets(pvlitM~.,data=data_lit,nbest=1,method = c("forward"))
+summ.adjr_lit<-summary(adjr_lit)
+which.max(summ.adjr_lit$adjr2)
+summ.adjr_lit
+# GENDER_R, AGE_R, ED_Level, pub_priv, work_flexM, act_lrn, NFEHRS
+```
 
 
