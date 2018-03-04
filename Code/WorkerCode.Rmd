@@ -276,7 +276,7 @@ null.priv.lit<- lm(pvlitM~1,data=data_priv_lit)
 full.priv.lit<- lm(pvlitM~.,data=data_priv_lit)
 
 #AIC
-(step(null.priv.lit, scope = list(lower=null.priv.lit,upper=full.priv.lit), direction="both", criterion = "AIC",trace = F))$coefficients  
+(step(null.priv.lit, scope = list(lower=null.priv.lit,upper=full.priv.lit), direction="both", criterion = "AIC",trace = T))$coefficients  
 #ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS
 
 
@@ -381,9 +381,27 @@ anova(lm(pvlitM~ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R,data=data_lit
 ```
 Final model check:
 ```{r}
-lm_lit_final <- lm(pvlitM~ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R, data=data_lit)
+lm_lit_final <- lm(pvlitM~ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R + pub_priv,  data=data_lit)
 summary(lm_lit_final)
 ```
 
+##forward AdjR^2
+1) numeracy
+```{r}
+library(leaps)
+options(digits=5)
+adjr_num<-regsubsets(pvnumM~.,data=data_num,nbest=1,method = c("forward"))
+summ.adjr_num<-summary(adjr_num)
+which.max(summ.adjr_num$adjr2)
+summ.adjr_num
+# GENDER_R, AGE_R, ED_Level, pub_priv, work_flexM, act_lrn, FNFAET12NJR, NFEHRS
+```
 
-
+2)literacy 
+```{r}
+adjr_lit<-regsubsets(pvlitM~.,data=data_lit,nbest=1,method = c("forward"))
+summ.adjr_lit<-summary(adjr_lit)
+which.max(summ.adjr_lit$adjr2)
+summ.adjr_lit
+# GENDER_R, AGE_R, ED_Level, pub_priv, work_flexM, act_lrn, NFEHRS
+```
