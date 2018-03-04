@@ -50,24 +50,9 @@ The top left and top right Q-Q plot are not on a straight line. We might need so
 The bottom left and bottom right Q-Q plot seem on a straight line so it is fair to say that the two responses(pvnumM, pvlitM) of our sample are normal distributed. The assumption of linear regression is statisfied.
 
 
-### 2. Check Missing Value
+### 2.Show summary statistics and check Missing Value
 ```{r results= 'hide'}
-nrow(newdata[is.na(newdata$Mgr),]) #501
-nrow(newdata[is.na(newdata$GENDER_R),]) #0
-nrow(newdata[is.na(newdata$ED_Level),]) #0
-nrow(newdata[is.na(newdata$EMPloyed),]) #0
-nrow(newdata[is.na(newdata$Full_part),]) #0
-nrow(newdata[is.na(newdata$Years_wk),]) #0
-nrow(newdata[is.na(newdata$work_flexM),]) #0
-nrow(newdata[is.na(newdata$work_lrnM),]) #0
-nrow(newdata[is.na(newdata$pub_priv),]) #40
-nrow(newdata[is.na(newdata$NFE12),]) #0
-nrow(newdata[is.na(newdata$FNFAET12),]) #0
-nrow(newdata[is.na(newdata$FNFE12JR),]) #0
-nrow(newdata[is.na(newdata$FNFAET12JR),]) #0
-nrow(newdata[is.na(newdata$FNFAET12NJR),]) #0
-nrow(newdata[is.na(newdata$NFEHRS),]) #0
-
+summary(newdata)
 ```
 There are 501 missing value in the 'Mgr' column, which is more than 40% of the total number of the observations. I would suggest that progressing our regression analysis without this variable first. 
 
@@ -85,7 +70,7 @@ nrow(newdata[newdata$ED_Level == 8,]) #only one observation, changes it to 4
 newdata<- within(newdata, ED_Level[ED_Level==8]<-4 )
 
 ##2.Categorical variable
-newdata$pub_priv <- factor(newdata$pub_priv)
+newdata$pub_priv <- as.factor(newdata$pub_priv)
 newdata$GENDER_R <- as.factor(newdata$GENDER_R)
 newdata$ED_Level <- as.factor(newdata$ED_Level)
 newdata$Full_part <- as.factor(newdata$Full_part)
@@ -122,9 +107,15 @@ data_lit<- na.omit(data_lit) #1207
 
 ### 4. Correlations
 ```{r}
-newdata.numeric<-newdata[,c("AGE_R","Years_wk","work_flexM","work_lrnM","act_lrn",
-                            "NFEHRS","pvlitM","pvnumM")]
-cor(newdata.numeric)
+newdata.numeric<-newdata[,c("AGE_R","Years_wk","work_flexM","work_lrnM","act_lrn","NFEHRS","pvlitM","pvnumM")]
+m<-cor(newdata.numeric)
+if (!require('corrplot')) install.packages('corrplot')
+library('ggplot2')
+corrplot(m, method = "circle") #plot matrix
+
+categorical<-c("GENDER_R","Full_part","ED_Level","pub_priv","NFE12","FNFAET12JR","FNFAET12NJR")
+catcorrm <- function(categorical, newdata) sapply(categorical, function(y) sapply(categorical, function(x) assocstats(table(unlist(newdata[,x]), unlist(newdata[,y])))$cramer))
+catcorrm(categorical,newdata)
 ```
 
 
@@ -133,86 +124,28 @@ cor(newdata.numeric)
 ```{r}
 #anova
 # pvlitM vs gender
-boxplot(pvlitM~GENDER_R,data=newdata, main="gender vs pvlitM", 
-      xlab="gender", ylab="literacy score")
-summary(aov(pvlitM~GENDER_R,data=newdata))
-
-# pvlitM vs age
-newdata$age_cat <-cut(newdata$AGE_R, c(49,55,60,65))
-boxplot(pvlitM~age_cat,data=newdata, main="age vs pvlitM", 
-      xlab="age", ylab="literacy score")
-summary(aov(pvlitM~age_cat,data=newdata))
-
-
-interaction.plot(newdata$GENDER_R, newdata$age_cat, newdata$pvlitM)
-summary(aov(pvlitM~age_cat*GENDER_R,data=newdata))
+boxplot(pvlitM~GENDER_R,data=newdata, main="gender vs pvlitM", xlab="gender", ylab="literacy score")
 
 # pvlitM vs full/part time
-boxplot(pvlitM~Full_part,data=newdata, main="pvlitM vs full/part time", 
-      xlab="full/part time", ylab="literacy score")
-summary(aov(pvlitM~Full_part,data=newdata))
+boxplot(pvlitM~Full_part,data=newdata, main="pvlitM vs full/part time", xlab="full/part time", ylab="literacy score")
 
 # pvlitM vs education
-boxplot(pvlitM~ED_Level,data=newdata, main="pvlitM vs education", 
-      xlab="education", ylab="literacy score")
-summary(aov(pvlitM~ED_Level,data=newdata))
-
-# pvlitM vs work year
-newdata$Years_wk_cat <-cut(newdata$Years_wk, c(0,10,20,30,40,100), right=FALSE)
-boxplot(pvlitM~Years_wk_cat,data=newdata, main="pvlitM vs work year", 
-      xlab="work year", ylab="literacy score")
-summary(aov(pvlitM~Years_wk_cat,data=newdata))
-
-# pvlitM vs work_flexM
-newdata$flex_cat <-cut(newdata$work_flexM, c(1,2,3,4,6), right=FALSE)
-boxplot(pvlitM~flex_cat,data=newdata, main="pvlitM vs work flexibility", 
-      xlab="work flexibility", ylab="literacy score")
-summary(aov(pvlitM~flex_cat,data=newdata))
-
-# pvlitM vs active learning
-boxplot(pvlitM~act_lrn,data=newdata, main="pvlitM vs active learning", 
-      xlab="active learning", ylab="literacy score")
-summary(aov(pvlitM~act_lrn,data=newdata))
+boxplot(pvlitM~ED_Level,data=newdata, main="pvlitM vs education", xlab="education", ylab="literacy score")
 
 # pvlitM vs private/public
-boxplot(pvlitM~Full_part,data=newdata, main="pvlitM vs private/public sector", 
-      xlab="private/public sector", ylab="literacy score")
-summary(aov(pvlitM~Full_part,data=newdata))
+boxplot(pvlitM~pub_priv,data=newdata, main="pvlitM vs private/public sector", xlab="private/public sector", ylab="literacy score")
 
 # pvlitM vs None formal education
-boxplot(pvlitM~NFE12,data=newdata, main="pvlitM vs None formal education", 
-      xlab="None formal education", ylab="literacy score")
-summary(aov(pvlitM~NFE12,data=newdata))
+boxplot(pvlitM~NFE12,data=newdata, main="pvlitM vs None formal education", xlab="None formal education", ylab="literacy score")
 
 # pvlitM vs adult eduction
-boxplot(pvlitM~FNFAET12,data=newdata, main="pvlitM vs adult eduction", 
-      xlab="adult eduction", ylab="literacy score")
-summary(aov(pvlitM~FNFAET12,data=newdata))
-
-# pvlitM vs adult eduction
-unique(newdata$NFEHRS)
-summary(lm(pvlitM~NFEHRS,data=newdata))
-boxplot(pvlitM~NFEHRS,data=newdata, main="pvlitM vs eductaion", 
-      xlab="adult eduction", ylab="literacy score")
-summary(aov(pvlitM~NFEHRS,data=newdata))
+boxplot(pvlitM~FNFAET12,data=newdata, main="pvlitM vs adult eduction", xlab="adult eduction", ylab="literacy score")
 ```
 
 ### 3-2. ANOVA for pvnum
 ```{r}
 # pvnum vs gender
-boxplot(pvnumM~GENDER_R,data=newdata, main="gender vs pvnum", 
-      xlab="gender", ylab="numeracy score")
-summary(aov(pvnumM~GENDER_R,data=newdata))
-
-# pvnum vs age
-newdata$age_cat <-cut(newdata$AGE_R, c(49,55,60,65))
-boxplot(pvnumM~age_cat,data=newdata, main="age vs pvnumM", 
-      xlab="age", ylab="numeracy score")
-summary(aov(pvnumM~age_cat,data=newdata))
-
-
-interaction.plot(newdata$GENDER_R, newdata$age_cat, newdata$pvnumM)
-summary(aov(pvnumM~age_cat*GENDER_R,data=newdata))
+boxplot(pvnumM~GENDER_R,data=newdata, main="gender vs pvnum", xlab="gender", ylab="numeracy score")
 
 # pvnum vs full/part time
 boxplot(pvnumM~Full_part,data=newdata, main="pvnumM vs full/part time", 
@@ -225,9 +158,7 @@ boxplot(pvnumM~ED_Level,data=newdata, main="pvnumM vs education",
 summary(aov(pvnumM~ED_Level,data=newdata))
 
 # pvnum vs work year
-boxplot(pvnumM~Years_wk_cat,data=newdata, main="pvnumM vs work year", 
-      xlab="work year", ylab="numeracy score")
-summary(aov(pvnumM~Years_wk_cat,data=newdata))
+boxplot(pvnumM~Years_wk_cat,data=newdata, main="pvnumM vs work year", xlab="work year", ylab="numeracy score")
 ```
 
 
@@ -311,20 +242,13 @@ anova(lm.lit.without,lm.lit.with)$`Pr(>F)`[2]
 2) Verify the AIC result using anova
 2)-1: numeracy
 ```{r numeracy}
-anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -pub_priv,data=data_num))$`Pr(>F)`[2] 
-anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -GENDER_R,data=data_num))$`Pr(>F)`[2] 
-anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -AGE_R,data=data_num))$`Pr(>F)`[2] 
-anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -ED_Level,data=data_num))$`Pr(>F)`[2] 
-anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -Full_part,data=data_num))$`Pr(>F)`[2] 
-anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -Years_wk,data=data_num))$`Pr(>F)`[2] 
-anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -work_flexM,data=data_num))$`Pr(>F)`[2]
-anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -act_lrn,data=data_num))$`Pr(>F)`[2] 
-anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -NFE12,data=data_num))$`Pr(>F)`[2]
-anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -FNFAET12JR,data=data_num))$`Pr(>F)`[2] 
-anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -FNFAET12NJR,data=data_num))$`Pr(>F)`[2] 
-anova(lm(pvnumM~.,data=data_num),lm(pvnumM~. -NFEHRS,data=data_num))$`Pr(>F)`[2] 
+varlist <- names(data_num)[-10]
+models <- lapply(varlist, function(x) {
+    anova(lm(pvnumM~.,data=data_num),lm(substitute(pvnumM ~. -i, list(i = as.name(x))), data =data_num))$`Pr(>F)`[2]
+})
+do.call(rbind, Map(data.frame, name=as.list(varlist), pvalue=models))
 ```
-pub_priv,GENDER_R,AGE_R,ED_Level,work_flexM,act_lrn,FNFAET12NJR
+pub_priv,AGE_R,ED_Level,work_flexM,act_lrn,FNFAET12NJR
 
 
 Remark: check NFEHRS for numeracy:
@@ -353,25 +277,10 @@ summary(lm.num.without2) #all p-value < 0.05
 ```{r}
 names(data_lit)
 varlist <- names(data_lit)[-10]
-
 models <- lapply(varlist, function(x) {
-   print(i)
-    anova(lm(pvlitM~.,data=data_lit),lm(substitute(pvlitM ~. -i, list(i = as.name(x))), data = data_lit))$`Pr(>F)`[2]  
+    anova(lm(pvlitM~.,data=data_lit),lm(substitute(pvlitM ~. -i, list(i = as.name(x))), data =data_lit))$`Pr(>F)`[2]
 })
-
-lapply(models, summary)
-anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -pub_priv,data=data_lit))$`Pr(>F)`[2]  
-anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -GENDER_R,data=data_lit))$`Pr(>F)`[2] 
-anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -AGE_R,data=data_lit))$`Pr(>F)`[2] 
-anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -ED_Level,data=data_lit))$`Pr(>F)`[2] 
-anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -Full_part,data=data_lit))$`Pr(>F)`[2] 
-anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -Years_wk,data=data_lit))$`Pr(>F)`[2] 
-anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -work_flexM,data=data_lit))$`Pr(>F)`[2]
-anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -act_lrn,data=data_lit))$`Pr(>F)`[2] 
-anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -NFE12,data=data_lit))$`Pr(>F)`[2]
-anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -FNFAET12JR,data=data_lit))$`Pr(>F)`[2] 
-anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -FNFAET12NJR,data=data_lit))$`Pr(>F)`[2] 
-anova(lm(pvlitM~.,data=data_lit),lm(pvlitM~. -NFEHRS,data=data_lit))$`Pr(>F)`[2] 
+do.call(rbind, Map(data.frame, name=as.list(varlist), pvalue=models))
 ```
 Variables that P-value <0.05: pub_priv,AGE_R,ED_Level,work_flexM,act_lrn
 
@@ -394,47 +303,7 @@ lm_lit_final <- lm(pvlitM~ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R, da
 summary(lm_lit_final)
 ```
 
-```{r}
-newdata$
-for (col_name in names(newdata))
-{
-  tb<-table(newdata$GENDER_R,newdata$AGE_R)
-}
-'$'(newdata , "GENDER_R")
-tb<-chisq.test($`(newdata , "GENDER_R"),newdata[,"AGE_R"])
-tb<-table(newdata$GENDER_R,newdata$ED_Level)#p-value = 1.507e-12 dependent
-chisq.test(tb) 
-tb<-table(newdata$GENDER_R,newdata$age_cat)#p-value = 0.5242 independent
-chisq.test(tb) 
-tb<-table(newdata$GENDER_R,newdata$Full_part)#p-value = 7.358e-13 dependent
-chisq.test(tb) 
-tb<-table(newdata$GENDER_R,newdata$pub_priv)#p-value = 0.2215 independent
-chisq.test(tb)
-tb<-table(newdata$GENDER_R,newdata$flex_cat)#p-value =  0.01908 dependent
-chisq.test(tb)
-tb<-table(newdata$GENDER_R,newdata$NFE12)#p-value =  0.009079 dependent
-chisq.test(tb)
-tb<-table(newdata$GENDER_R,newdata$FNFE12JR)#p-value =  0.003244 dependent
-chisq.test(tb)
 
-tb<-table(newdata$ED_Level,newdata$age_cat)#p-value = 2.268e-08 dependent
-chisq.test(tb)
-tb<-table(newdata$ED_Level,newdata$Full_part)#p-value = 0.0004919 dependent
-chisq.test(tb)
-tb<-table(newdata$ED_Level,newdata$pub_priv)#p-value < 2.2e-16 dependent
-chisq.test(tb)
-tb<-table(newdata$ED_Level,newdata$flex_cat)#p-value = 2.766e-10 dependent
-chisq.test(tb)
-tb<-table(newdata$ED_Level,newdata$NFE12)#p-value < 2.2e-16 dependent
-chisq.test(tb)
-tb<-table(newdata$ED_Level,newdata$FNFE12JR)#p-value < 2.2e-16 dependent
-chisq.test(tb)
-```
-```{r}
-death_table = matrix(c("dependent", "dependent", "dependent", "dependent"), ncol=2)
-colnames(death_table) = c('ed_level', 'age')
-rownames(death_table) = c('ed_level', 'age')
-death_table = as.table(death_table)
-```
+
 
 
