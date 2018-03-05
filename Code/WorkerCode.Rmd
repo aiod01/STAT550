@@ -13,6 +13,8 @@ library(haven)
 Rawdata<- read_sav(path)  #1247
 ```
 
+
+
 ## Data Pre-processing
 ### 1. Check Responses (Dependent variables)
 ```{r response skil_num}
@@ -161,6 +163,10 @@ full.lit<-lm(pvlitM~.,data=data_lit)
 null.lit<-lm(pvlitM~1,data=data_lit)
 (step(null.lit,scope = list(lower=null.lit,upper=full.lit),direction="both", criterion = 
       "AIC", trace = F))$coefficients #ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS,public/private
+
+step(full.lit,direction="both") 
+#GENDER_R + AGE_R + ED_Level + pub_priv + work_flexM + act_lrn + NFEHRS, same as above
+
 ```
 
 #### 1-3 Stepwise AIC (only private)
@@ -214,6 +220,10 @@ full.num<-lm(pvnumM~.,data=data_num)
 null.num<-lm(pvnumM~1,data=data_num)
 (step(null.num,scope = list(lower=null.num,upper=full.num), direction="forward", criterion 
      = "AIC", trace = F))$coefficients #ED_Level, act_lrn, Age, Gender,public/private,work_flexM,NFEHRS
+
+step(full.num,direction="forward") 
+#GENDER_R + AGE_R + ED_Level + Full_part + Years_wk + pub_priv + work_flexM + work_lrnM + act_lrn + NFE12 + FNFAET12JR + FNFAET12NJR + NFEHRS, different
+
 ```
 
 ### 2-3. Stepwise AIC (Only private)
