@@ -152,6 +152,7 @@ summ.adjr_lit<-summary(adjr_lit)
 which.max(summ.adjr_lit$adjr2)
 summ.adjr_lit # GENDER_R, AGE_R, ED_Level(3), pub_priv, work_flexM, act_lrn, NFEHRS
 ```
+
 #### 1-2 Stepwise AIC 
 ```{r}
 #literacy: use data_lit
@@ -159,8 +160,7 @@ table(newdata$pub_priv)
 library(MASS)
 full.lit<-lm(pvlitM~.,data=data_lit)
 null.lit<-lm(pvlitM~1,data=data_lit)
-(step(null.lit,scope = list(lower=null.lit,upper=full.lit),direction="both", criterion = 
-      "AIC", trace = F))$coefficients #ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS,public/private
+(step(null.lit,scope = list(lower=null.lit,upper=full.lit),direction="forward", trace = T))$coefficients #ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS,public/private
 ```
 
 #### 1-3 Stepwise AIC (only private)
