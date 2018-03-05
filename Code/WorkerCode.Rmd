@@ -82,6 +82,10 @@ t.test(pvnumM~FNFAET12JR, data = newdata)$p.value #p-value < 2.2e-16
 t.test(pvnumM~FNFAET12NJR, data = newdata)$p.value #p-value = 6.66e-06
 ##they are all statistically significant and FNFAET12 is the union of other two variables.
 
+wilcox.test(pvlitM~FNFAET12, data = newdata)$p.value #p-value <2e-16
+wilcox.test(pvlitM~FNFAET12JR, data = newdata)$p.value # 6.0868e-11
+wilcox.test(pvlitM~FNFAET12NJR, data = newdata)$p.value #0.00042702
+
 ##4.FNFE12JR and FNFAET12JR
 table(newdata$FNFE12JR == newdata$FNFAET12JR) #They are exactly the same: use one of them
 ```
