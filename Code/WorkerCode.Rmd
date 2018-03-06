@@ -173,6 +173,7 @@ null.priv.lit<- lm(pvlitM~1,data=data_priv_lit)
 full.priv.lit<- lm(pvlitM~.,data=data_priv_lit)
 (step(null.priv.lit, scope = list(lower=null.priv.lit,upper=full.priv.lit), direction="forward", criterion = "AIC",trace = F))$coefficients   #ED_Level, act_lrn, Age, Gender, work_flexM, NFEHRS
 ```
+
 #### 1-4 Model Comparison
 1) check private/public sector 
 ```{r lit_priv/pub}
@@ -182,6 +183,7 @@ summary(lm.lit.without) #p-value of NFEHRS = 0.112
 lm.lit.with<-lm(formula = pvlitM ~ ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R + NFEHRS, data = data_lit)
 anova(lm.lit.without,lm.lit.with)$`Pr(>F)`[2]  # p-value = 0.0185**
 ```
+
 2) ANOVA: With vs without one variable
 ```{r anova}
 varlist <- names(data_lit)[-10]
@@ -212,10 +214,7 @@ summ.adjr_num # GENDER_R, AGE_R, ED_Level, pub_priv, work_flexM, act_lrn,NFE121,
 full.num<-lm(pvnumM~.,data=data_num)
 null.num<-lm(pvnumM~1,data=data_num)
 (step(null.num,scope = list(lower=null.num,upper=full.num), direction="forward", criterion 
-     = "AIC", trace = F))$coefficients #ED_Level, act_lrn, Age, Gender,public/private,work_flexM,NFEHRS
-
-step(full.num,direction="forward") 
-#GENDER_R + AGE_R + ED_Level + Full_part + Years_wk + pub_priv + work_flexM + work_lrnM + act_lrn + NFE12 + FNFAET12JR + FNFAET12NJR + NFEHRS, different
+     = "AIC", trace = F))$coefficients #ED_Level, act_lrn, Age, Gender, public/private, work_flexM, NFEHRS
 
 ```
 
@@ -261,7 +260,8 @@ anova(lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R+ work_flexM + GENDER_R +p
 anova(lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R+ work_flexM + GENDER_R +pub_priv, data = data_num),lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R +  pub_priv +FNFAET12JR, data = data_num))$`Pr(>F)`[2]  #FNFAET12JR: 0.78678
 
 ```
- 4)Final model check:
+
+4)Final model check:
 ```{r final_lit}
 summary(lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R+ work_flexM + 
      GENDER_R +pub_priv, data = data_num)) #all p-value < 0.05
