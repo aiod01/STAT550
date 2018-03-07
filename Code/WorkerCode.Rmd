@@ -13,8 +13,6 @@ library(haven)
 Rawdata<- read_sav(path)  #1247
 ```
 
-
-
 ## Data Pre-processing
 ### 1. Check Responses (Dependent variables)
 ```{r skil_num}
@@ -58,8 +56,9 @@ There are 501 missing value in the 'Mgr' column and 1015 missing value in the 'M
 ```{r independent} 
 ##1.ED_Level
 unique(newdata$ED_Level)
+table(newdata$ED_Level)
 nrow(newdata[newdata$ED_Level == 8,]) #only one observation, changes it to 4
-newdata<- within(newdata, ED_Level[ED_Level==8]<-4 )
+newdata<- within(newdata, ED_Level[ED_Level==8]<-1 )
 
 ##2.Categorical variable
 newdata$pub_priv <- as.factor(newdata$pub_priv)
@@ -102,6 +101,7 @@ newdata.numeric<-newdata[,c("AGE_R","Years_wk","work_flexM","work_lrnM","act_lrn
 m<-cor(newdata.numeric)
 if (!require('corrplot')) install.packages('corrplot')
 library('ggplot2')
+library(vcd)
 corrplot(m, method = "circle") #plot matrix
 categorical<-c("GENDER_R","Full_part","ED_Level","pub_priv","NFE12","FNFAET12JR","FNFAET12NJR")
 catcorrm <- function(categorical, newdata) sapply(categorical, function(y) sapply(categorical, function(x) 
@@ -151,8 +151,8 @@ library(leaps)
 options(digits=5)
 adjr_lit<-regsubsets(pvlitM~.,data=data_lit,nbest=1,method = c("forward"),nvmax=15)
 summ.adjr_lit<-summary(adjr_lit)
-which.max(summ.adjr_lit$adjr2)
-summ.adjr_lit # GENDER_R, AGE_R, ED_Level(3), pub_priv, work_flexM, act_lrn, NFEHRS
+which.max(summ.adjr_lit$adjr2)#7
+# GENDER_R, AGE_R, ED_Level(3), pub_priv, work_flexM, act_lrn, NFEHRS
 ```
 
 #### 1-2 Stepwise AIC 
@@ -162,7 +162,7 @@ table(newdata$pub_priv)
 library(MASS)
 full.lit<-lm(pvlitM~.,data=data_lit)
 null.lit<-lm(pvlitM~1,data=data_lit)
-(step(null.lit,scope = list(lower=null.lit,upper=full.lit),direction="forward", trace = T))$coefficients #ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS,public/private
+(step(null.lit,scope = list(lower=null.lit,upper=full.lit),direction="forward", trace = F))$coefficients #ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS,public/private
 #GENDER_R + AGE_R + ED_Level + pub_priv + work_flexM + act_lrn + NFEHRS, same as above
 ```
 
@@ -182,6 +182,8 @@ lm.lit.without<-lm(formula = pvlitM ~ ED_Level + act_lrn + AGE_R+ work_flexM +
 summary(lm.lit.without) #p-value of NFEHRS = 0.112
 lm.lit.with<-lm(formula = pvlitM ~ ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R + NFEHRS, data = data_lit)
 anova(lm.lit.without,lm.lit.with)$`Pr(>F)`[2]  # p-value = 0.0185**
+?anova
+
 ```
 
 2) ANOVA: With vs without one variable
@@ -206,16 +208,18 @@ anova(lm(pvlitM~ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R,data=data_lit
 adjr_num<-regsubsets(pvnumM~.,data=data_num,nbest=1,method = c("forward"),nvmax=15)
 summ.adjr_num<-summary(adjr_num)
 which.max(summ.adjr_num$adjr2)
-summ.adjr_num # GENDER_R, AGE_R, ED_Level, pub_priv, work_flexM, act_lrn,NFE121,FNFAET12JR1 FNFAET12NJR1,NFEHRS
+# GENDER_R, AGE_R, ED_Level, pub_priv, work_flexM, act_lrn,NFE121,FNFAET12JR1， FNFAET12NJR1,NFEHRS
 ```
 
 #### 2-2 Stepwise AIC
 ```{r}
+digit
 full.num<-lm(pvnumM~.,data=data_num)
 null.num<-lm(pvnumM~1,data=data_num)
 (step(null.num,scope = list(lower=null.num,upper=full.num), direction="forward", criterion 
-     = "AIC", trace = F))$coefficients #ED_Level, act_lrn, Age, Gender, public/private, work_flexM, NFEHRS
-
+     = "AIC", trace = T))$coefficients #ED_Level, act_lrn, Age, Gender, public/private, work_flexM, NFEHRS
+#step(full.num,scope = list(lower=null.num), direction="backward", criterion 
+     = "AIC", trace = T)
 ```
 
 #### 2-3. Stepwise AIC (Only private)
@@ -234,6 +238,7 @@ lm.num.without<-lm(pvnumM ~ ED_Level + act_lrn + AGE_R + GENDER_R +
     work_flexM + NFEHRS, data = data_num)
 lm.num.with<-lm(pvnumM ~ ED_Level + act_lrn + AGE_R + GENDER_R + 
     work_flexM + NFEHRS + pub_priv, data = data_num)
+
 summary(lm.num.with) #NFEHRS:0.13733
 anova(lm.num.without,lm.num.with)$`Pr(>F)`[2] # p-value = 0.0037**
 ```
@@ -258,6 +263,8 @@ anova(lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R+ work_flexM + GENDER_R +p
 anova(lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R+ work_flexM + GENDER_R +pub_priv, data = data_num),lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R +  pub_priv +NFE12, data = data_num))$`Pr(>F)`[2] #NFE12: 0.47319
 
 anova(lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R+ work_flexM + GENDER_R +pub_priv, data = data_num),lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R +  pub_priv +FNFAET12JR, data = data_num))$`Pr(>F)`[2]  #FNFAET12JR: 0.78678
+
+anova(lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R+ work_flexM + GENDER_R +pub_priv, data = data_num),lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R +  pub_priv +FNFAET12JR + NFE12 + FNFAET12NJR , data = data_num))$`Pr(>F)`[2]  # 0.15948
 
 ```
 
