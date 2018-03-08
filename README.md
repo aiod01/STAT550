@@ -1,10 +1,10 @@
 # STAT 450/550 Project: Skill Use of Senior Workers in South Korea within the Workplace
 ## Group Information
 
-[First proposal](https://github.com/aiod01/STAT550-450-for-Seniorworkers-from-Korea/blob/master/Documents/Proposal/FirstProposal.docx)
+[Final Proposal](https://github.com/aiod01/STAT550-450-for-Seniorworkers-from-Korea/blob/master/Documents/Proposal/FinalProposal.docx)
 
 
-**Client**: Hyunok Yoo
+**Client**: Hyunok Ryu
 
 **STAT 450**:
 
