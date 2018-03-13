@@ -18,7 +18,7 @@ output:
 library(haven)
 Rawdata<- read_sav("/Users/xinyaofan/Desktop/Data-NFEHRS_revised.sav")
 ```
-**$\emph{Comment1:}$ For data input, you can juse "read_sav" function directly. For example, my data is on my desktop, and I can input the data by the above code easily.**
+**$\emph{Comment1:}$ For data input, you can use "read_sav" function directly. For example, my data is on my desktop, and I can input the data by the above code easily.**
 
 ## Data Pre-processing
 **$\emph{Comment2:}$ Usually, we call this part "Exploratory Analysis." **
