@@ -218,7 +218,7 @@ full.priv.lit<- lm(pvlitM~.,data=data_priv_lit)
 (step(null.priv.lit, scope = list(lower=null.priv.lit,upper=full.priv.lit), direction="forward", criterion = "AIC",trace = F))$coefficients   #ED_Level, act_lrn, Age, Gender, work_flexM, NFEHRS
 ```
 
-**Comment12: For me, I usually construct a full mode and then use the step function directly. Becase you can set the parameters in this step function. For example, step(full.num,method="backward") or step(full.num,method="forward"). That's more concise.**
+**Comment12: For me, I usually construct a full model first and then use the step function directly. Becase you can set the parameters in this step function. For example, step(full.num,method="backward") or step(full.num,method="forward"). That's more concise.**
 
 #### 1-4 Model Comparison
 1) check private/public sector 
