@@ -31,7 +31,7 @@ nrow(Rawdata[Rawdata$num_use==7,])
 
 The max of num_use is 5 so I guessed 7 may be an artefact of the data. Also, there are other four missing value in this observation.Therefore, we would exclude this obervation(num_use=7).
 
-**$\emph{Comment3}:$ For this part, you find some data out of our range of response data. I think it's better you count how many obeservations whose num_use=7. How do you find that only one observation has num_use=7? I will recommend the following code. Since you can find the position of the artefact data and can delete them from your rawdata directly.**
+**$\emph{Comment3}:$ For this part, you find some data out of our range of response data. I will recommend the following code. Since you can find the position of the artefact data and can delete them from your rawdata directly. In your code, it can't show the position of that record.**
 ```{r}
 #sum(Rawdata$num_use==7) ##count how many artefact data
 #which(Rawdata$num_use==7) ## find the position of the data
@@ -316,7 +316,8 @@ anova(lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R+ work_flexM + GENDER_R +p
 
 ```
 
-**Comment15: Add some comments here. It's really hard for the readers to know what's going on in this part. Based on my understanding, you get two models A and B using stepwise AIC(forward and backward) and A is nested in B. Why not to use ANOVA to compare A and B first? As for the part ANOVA: With vs without one variable, I have some doubts about that. I give details in my comments of report. My suggestions are as follows: First, use anova to compare model A and B to find whether they are significantly different. Then deleting NFEHRS from A get the model C. Use anova to compare A and C. Based on your results to draw some conclusions. **
+**Comment15: Add some comments here. It's really hard for the readers to know what's going on in this part. Based on my understanding, you get two models A and B using stepwise AIC(forward and backward) and A is nested in B. Why not to use ANOVA to compare A and B first? As for the part 'ANOVA: With vs without one variable' I have some doubts about that. I give details in my comments of report. My suggestions are as follows: First, use anova to compare model A and B to find whether they are significantly different. If not, then delete NFEHRS from A and get the model C.(You can also delete any other one variable from A and use ANOVA to compare this model with A.) Use anova to compare A and C. Based on your results to draw some conclusions. **
+
 
 
 4)Final model check:
