@@ -43,8 +43,10 @@ summary(newdata$pvlitM)
 qqnorm(newdata$pvlitM)
 qqline(newdata$pvlitM)
 ```
-** It would be nice to make a table or data frame containing all the summary information just using one summary fucntion, such as summary(newdata)[,c(15,16,17,18)] . It would be nicer to add the title for each plot :)**
-#summary(newdata$num_use)
+
+**It would be nice to make a table or data frame containing all the summary information just using one summary fucntion, such as summary(newdata)[,c(15,16,17,18)] . It would be nicer to add the title for each plot :) **
+
+
 The top left and top right Q-Q plot are not on a straight line. We might need some further transformation on the responses(num_use, liter_use)
  
 The bottom left and bottom right Q-Q plot seem on a straight line so it is fair to say that the two responses(pvnumM, pvlitM) of our sample are normal distributed. The assumption of linear regression is statisfied.
@@ -55,6 +57,7 @@ sum.data<-summary(newdata)[7,]
 sum.data[!is.na(sum.data)]
 ```
 ** This is nice. interesting codes for me...**
+
 There are 501 missing value in the 'Mgr' column and 1015 missing value in the 'Mgr_c' colum, which contain both more than 40 % of the total number of the observations. I would suggest that progressing our regression analysis without these two variables first. There are 39 missing values in the 'pub_priv' and we don't know which sector they are.
 
 ### 3.Check Independent Variable
@@ -115,6 +118,7 @@ assocstats(table(unlist(newdata[,x]), unlist(newdata[,y])))$cramer))
 catcorrm(categorical,newdata) #only FNFAET12JR and NFE12 have very strong correlation(0.83376057)
 ```
 ** We may need this too: if (!require('vcd')) install.packages('vcd') **
+
 ### 5.1 boxplot visualiztion - pvlitM
 ```{r}
 #anova
@@ -197,6 +201,7 @@ models <- lapply(varlist, function(x) {
 do.call(rbind, Map(data.frame, name=as.list(varlist), pvalue=models))
 ```
 Variables that P-value <0.05: pub_priv,AGE_R,ED_Level,work_flexM,act_lrn
+
 **From this part, I feel like the comments are getting less and readers might feel hard to understand what is going on...I would like to recommend you put more comments so that people can understand it easliy.This code itself is fine. You may also use drop1() function, just for your information.**
 
 3)
@@ -245,6 +250,8 @@ summary(lm.num.with) #NFEHRS:0.13733
 anova(lm.num.without,lm.num.with)$`Pr(>F)`[2] # p-value = 0.0037**
 ```
 **Even if the p value is high, you can add the covariate if you think it is reasonable to add the variable in common sense, especially depending on the field.**
+
+
 2) ANOVA: With vs without one variable
 ```{r anova}
 varlist <- names(data_num)[-10]
@@ -272,6 +279,8 @@ anova(lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R+ work_flexM + GENDER_R +p
 
 ```
 **It would be nicer to explain what are you trying to do here with more detail...Please add more comments :)**
+
+
 4)Final model check:
 ```{r final_lit}
 summary(lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R+ work_flexM + 
