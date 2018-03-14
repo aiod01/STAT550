@@ -31,7 +31,7 @@ nrow(Rawdata[Rawdata$num_use==7,])
 
 The max of num_use is 5 so I guessed 7 may be an artefact of the data. Also, there are other four missing value in this observation.Therefore, we would exclude this obervation(num_use=7).
 
-**$\emph{Comment3}:$ For this part, you find some data out of our range of response data. I will recommend the following code. Since you can find the position of the artefact data and can delete them from your rawdata directly. In your code, it can't show the position of that record.**
+**$\emph{Comment3}:$ For this part, you find some data out of our range of response data. I will recommend the following code. Since you can find the position of the artefact data, view it and can delete them from your rawdata directly. In your code, it can't show the position of that record.**
 ```{r}
 #sum(Rawdata$num_use==7) ##count how many artefact data
 #which(Rawdata$num_use==7) ## find the position of the data
