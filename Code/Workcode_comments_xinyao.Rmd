@@ -1,0 +1,327 @@
+---
+title: "Senior Worker 450 Code"
+author: "Zhen Liu, Yutong Liu, Jingyi Huang"
+date: "2018/2/1"
+output: 
+  pdf_document: 
+    latex_engine: xelatex
+---
+## Data Input
+```{r data input}
+#s<-getwd()
+#substr(s, 1, nchar(s)-4)
+#path<-paste(substr(s, 1, nchar(s)-4),"Data/Data-NFEHRS_revised.sav",sep = "")
+#library(haven)
+#Rawdata<- read_sav(path)  #1247
+```
+```{r warning=FALSE}
+library(haven)
+Rawdata<- read_sav("/Users/xinyaofan/Desktop/Data-NFEHRS_revised.sav")
+```
+**$\emph{Comment1:}$ For data input, you can use "read_sav" function directly. For example, my data is on my desktop, and I can input the data by the above code easily.**
+
+## Data Pre-processing
+**$\emph{Comment2:}$ Usually, we call this part "Exploratory Analysis." **
+
+### 1. Check Responses (Dependent variables)
+```{r skil_num}
+summary(Rawdata$num_use)
+nrow(Rawdata[Rawdata$num_use==7,])  
+```
+
+The max of num_use is 5 so I guessed 7 may be an artefact of the data. Also, there are other four missing value in this observation.Therefore, we would exclude this obervation(num_use=7).
+
+**$\emph{Comment3}:$ For this part, you find some data out of our range of response data. I will recommend the following code. Since you can find the position of the artefact data, view it and can delete them from your rawdata directly. In your code, it can't show the position of that record.**
+```{r}
+#sum(Rawdata$num_use==7) ##count how many artefact data
+#which(Rawdata$num_use==7) ## find the position of the data
+#newdata<-Rawdata[-507,]
+```
+
+```{r}
+newdata<- Rawdata[Rawdata$num_use!=7,]  #1246
+par(mfrow=c(2,2))
+#1)skill_num
+summary(newdata$num_use)
+qqnorm(newdata$liter_use) 
+qqline(newdata$num_use)
+#2) skill_lit
+summary(newdata$liter_use)
+qqnorm(newdata$liter_use) 
+qqline(newdata$liter_use)
+#3) test_num
+summary(newdata$pvnumM)
+qqnorm(newdata$pvnumM)
+qqline(newdata$pvnumM)
+#4) test_lit
+summary(newdata$pvlitM)
+qqnorm(newdata$pvlitM)
+qqline(newdata$pvlitM)
+```
+
+**Comment4: This plot is good, but can be better. You can add the title for each plot, so readers can easily know the QQ plot is for which variable. It's easy to achieve. You only need to add a parameter "main" in your qqnorm. For example.**
+```{r}
+#qqnorm(newdata$liter_use,main="Normal QQplot for liter_use") 
+```
+The top left and top right Q-Q plot are not on a straight line. We might need some further transformation on the responses(num_use, liter_use)
+ 
+The bottom left and bottom right Q-Q plot seem on a straight line so it is fair to say that the two responses(pvnumM, pvlitM) of our sample are normal distributed. The assumption of linear regression is statisfied.
+
+### 2.Show summary statistics and check Missing Value
+```{r missing value}
+sum.data<-summary(newdata)[7,]
+sum.data[!is.na(sum.data)]
+```
+There are 501 missing value in the 'Mgr' column and 1015 missing value in the 'Mgr_c' colum, which contain both more than 40 % of the total number of the observations. I would suggest that progressing our regression analysis without these two variables first. There are 39 missing values in the 'pub_priv' and we don't know which sector they are.
+
+**Comment5: Very efficient way to find the missing value.**
+
+### 3.Check Independent Variable
+```{r independent} 
+##1.ED_Level
+unique(newdata$ED_Level)
+table(newdata$ED_Level) #only one observation =8 and only 4 observations=3; change them to 3
+newdata<- within(newdata, ED_Level[ED_Level==8]<-3 )
+newdata<- within(newdata, ED_Level[ED_Level==4]<-3 )
+```
+
+**Comment6: For this part, I run your code. It tells me ED_level has values "1","2","3","4","8". And there are 5 observations=4, there are 1 obeservation=8. I agree the value 8 is artefact data. But I check the variable description client provided, the ED_level has 4 values. 1 under middle school. 2. High school,3 (ISCED 5A) Bachelor. 4 (ISCED 5A/6) Master/PhD. Thus, I don't think you can change these values=4 directly into 3. The variable ED_level has 3 levels now if you change them directly. So, I suggest to delete the code"newdata<- within(newdata, ED_Level[ED_Level==4]<-3 )".**
+
+##2.Categorical variable
+```{r}
+newdata$pub_priv <- as.factor(newdata$pub_priv)
+newdata$GENDER_R <- as.factor(newdata$GENDER_R)
+newdata$ED_Level <- as.factor(newdata$ED_Level)
+newdata$Full_part <- as.factor(newdata$Full_part)
+newdata$NFE12 <- as.factor(newdata$NFE12)
+newdata$FNFE12JR <- as.factor(newdata$FNFE12JR)
+newdata$FNFAET12NJR <- as.factor(newdata$FNFAET12NJR)
+newdata$FNFAET12JR <- as.factor(newdata$FNFAET12JR)
+```
+
+**Comment7: The code is not so concise. I prefer to document these categorical variables' names and create a vector to save the name. Then write a funtion to convert them. For example, the follwing function**
+```{r}
+#FacTrans <- function(d, cols = colnames(d), f = as.factor) {
+#d[cols] <- lapply(d[cols], f)
+#return(d) }
+```
+
+##3. "FNFAET12" "FNFAET12JR" "FNFAET12NJR" t-test:
+```{r}
+#1)pvlitM
+t.test(pvlitM~FNFAET12, data = newdata)$p.value #p-value < 2.2e-16
+t.test(pvlitM~FNFAET12JR, data = newdata)$p.value #p-value = 9.813e-13
+t.test(pvlitM~FNFAET12NJR, data = newdata)$p.value #p-value = 0.0001315
+#2)pvnumM
+t.test(pvnumM~FNFAET12, data = newdata)$p.value #p-value < 2.2e-16
+t.test(pvnumM~FNFAET12JR, data = newdata)$p.value #p-value < 2.2e-16
+t.test(pvnumM~FNFAET12NJR, data = newdata)$p.value #p-value = 6.66e-06
+##they are all statistically significant and FNFAET12 is the union of other two variables.
+```
+##4.FNFE12JR and FNFAET12JR
+```{r}
+table(newdata$FNFE12JR == newdata$FNFAET12JR) #They are exactly the same: use one of them
+```
+
+**Comment8: It is reasonable to delete one of these variables, perfect for this part.**
+
+### 4. Two dataset:
+```{r two dataset}
+#1) proficiency test score(numeracy) + possbile factor
+data_num<- newdata[,c(1,2,5,7,9,10,13,14,17,19,20,23,24,25)]
+data_num<- na.omit(data_num) #1207
+#2) proficiency test score(literacy) + possbile factor
+data_lit<- newdata[,c(1,2,5,7,9,10,13,14,17,18,20,23,24,25)]
+data_lit<- na.omit(data_lit) #1207
+```
+
+### 5. Correlations
+```{r correlations}
+newdata.numeric<-newdata[,c("AGE_R","Years_wk","work_flexM","work_lrnM","act_lrn","NFEHRS","pvlitM","pvnumM")]
+m<-cor(newdata.numeric)
+if (!require('corrplot')) install.packages('corrplot')
+library('ggplot2')
+library(vcd)
+corrplot(m, method = "circle") #plot matrix
+categorical<-c("GENDER_R","Full_part","ED_Level","pub_priv","NFE12","FNFAET12JR","FNFAET12NJR")
+catcorrm <- function(categorical, newdata) sapply(categorical, function(y) sapply(categorical, function(x) 
+	assocstats(table(unlist(newdata[,x]), unlist(newdata[,y])))$cramer))
+catcorrm(categorical,newdata) #only FNFAET12JR and NFE12 have very strong correlation(0.83376057)
+```
+
+**comment9:You can put the package you need in the beginning. I mean put the code"library('ggplot2')", and "library(vcd) after "library(haven)." A perfact plot to show the correlation between continuous variables.**
+
+### 5.1 boxplot visualiztion - pvlitM
+```{r}
+#anova
+# pvlitM vs gender
+boxplot(pvlitM~GENDER_R,data=newdata, main="gender vs pvlitM", xlab="gender", ylab="literacy score")
+
+# pvlitM vs full/part time
+boxplot(pvlitM~Full_part,data=newdata, main="pvlitM vs full/part time", xlab="full/part time", ylab="literacy score")
+
+# pvlitM vs education
+boxplot(pvlitM~ED_Level,data=newdata, main="pvlitM vs education", xlab="education", ylab="literacy score")
+
+# pvlitM vs private/public
+boxplot(pvlitM~pub_priv,data=newdata, main="pvlitM vs private/public sector", xlab="private/public sector", ylab="literacy score")
+
+# pvlitM vs None formal education
+boxplot(pvlitM~NFE12,data=newdata, main="pvlitM vs None formal education", xlab="None formal education", ylab="literacy score")
+
+# pvlitM vs adult eduction
+boxplot(pvlitM~FNFAET12,data=newdata, main="pvlitM vs adult eduction", xlab="adult eduction", ylab="literacy score")
+```
+
+**Comment10: For this part, the code is not concise. As I suggested above, save these names of categorical variables in a vector. Then you can write a "for" loop to create these boxplots at one time instead of duplicate the code many times.**
+
+### 5.2 boxplot visualiztion - pvnumM
+```{r}
+# pvnum vs gender
+boxplot(pvnumM~GENDER_R,data=newdata, main="gender vs pvnum", xlab="gender", ylab="numeracy score")
+# pvnum vs full/part time
+boxplot(pvnumM~Full_part,data=newdata, main="pvnumM vs full/part time", xlab="full/part time", ylab="numeracy score")
+# pvnum vs education
+boxplot(pvnumM~ED_Level,data=newdata, main="pvnumM vs education", xlab="education", ylab="numeracy score")
+# pvnum vs work year
+```
+
+## Methods
+### 1. Literacy
+#### 1-1 Forward Adjusted R^2
+```{r}
+library(leaps)
+options(digits=5)
+adjr_lit<-regsubsets(pvlitM~.,data=data_lit,nbest=1,method = c("forward"),nvmax=15)
+summ.adjr_lit<-summary(adjr_lit)
+which.max(summ.adjr_lit$adjr2)#7
+# GENDER_R, AGE_R, ED_Level(3), pub_priv, work_flexM, act_lrn, NFEHRS
+```
+
+**Comment11: A samll thing, in your comments, the best model is No.7, but it should be the No.8 based on the results. Also put the library in the beginning.**
+
+####1-2 Stepwise AIC 
+```{r}
+table(newdata$pub_priv)
+library(MASS)
+full.lit<-lm(pvlitM~.,data=data_lit)
+null.lit<-lm(pvlitM~1,data=data_lit)
+(step(null.lit,scope = list(lower=null.lit,upper=full.lit),direction="forward", trace = F))$coefficients #ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS,public/private
+#GENDER_R + AGE_R + ED_Level + pub_priv + work_flexM + act_lrn + NFEHRS, same as above
+```
+
+#### 1-3 Stepwise AIC (only private)
+```{r }
+data_priv_lit<- data_lit[data_lit$pub_priv ==1 & (!is.na(data_lit$pub_priv)), ][,-6]
+null.priv.lit<- lm(pvlitM~1,data=data_priv_lit)
+full.priv.lit<- lm(pvlitM~.,data=data_priv_lit)
+(step(null.priv.lit, scope = list(lower=null.priv.lit,upper=full.priv.lit), direction="forward", criterion = "AIC",trace = F))$coefficients   #ED_Level, act_lrn, Age, Gender, work_flexM, NFEHRS
+```
+
+**Comment12: For me, I usually construct a full model first and then use the step function directly. Becase you can set the parameters in this step function. For example, step(full.num,method="backward") or step(full.num,method="forward"). That's more concise.**
+
+#### 1-4 Model Comparison
+1) check private/public sector 
+```{r lit_priv/pub}
+lm.lit.without<-lm(formula = pvlitM ~ ED_Level + act_lrn + AGE_R+ work_flexM + 
+									 	pub_priv + GENDER_R + NFEHRS, data = data_lit)
+lm.lit.with<-lm(formula = pvlitM ~ ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R + NFEHRS, data = data_lit)
+anova(lm.lit.without,lm.lit.with)$`Pr(>F)`[2]  # p-value = 0.020435**
+summary(lm.lit.with) #p-value of NFEHRS = 0.147
+```
+
+2) "Anova": With vs without one variable
+```{r anova, eval=FALSE, include=FALSE}
+varlist <- names(data_lit)[-10]
+models <- lapply(varlist, function(x) {
+	anova(lm(pvlitM~.,data=data_lit),lm(substitute(pvlitM ~. -i, list(i = as.name(x))), data =data_lit))$`Pr(>F)`[2]
+})
+do.call(rbind, Map(data.frame, name=as.list(varlist), pvalue=models))
+```
+Variables that P-value <0.05: pub_priv,AGE_R,ED_Level,work_flexM,act_lrn
+
+**Comment13: Just some supplements. For drop one, there is also a function called "drop1". This function will compute all the single terms in the scope argument that can be added to or dropped from the model, fit those models and compute a table of the changes in fit. What's more, the drop1 function focus on AIC, so it makes sense you use ANOVA to compare the models. I mean drop1 and Anova are from different perspectives.**
+
+3)
+```{r compare}
+anova(lm(pvlitM~ED_Level + act_lrn + AGE_R + work_flexM + NFEHRS,data=data_lit),lm(pvlitM~ED_Level + act_lrn + AGE_R + work_flexM, data=data_lit))$`Pr(>F)`[2]   #NFEHRS: 0.12197
+anova(lm(pvlitM~ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R,data=data_lit),lm(pvlitM~ED_Level + act_lrn + AGE_R + work_flexM, data=data_lit))$`Pr(>F)`[2]   #Gender: 0.04734
+```
+
+### 2. Numeracy
+#### 2-1 Forward Adjusted R^2
+```{r}
+adjr_num<-regsubsets(pvnumM~.,data=data_num,nbest=1,method = c("forward"),nvmax=15)
+summ.adjr_num<-summary(adjr_num)
+which.max(summ.adjr_num$adjr2)
+# GENDER_R, AGE_R, ED_Level, pub_priv, work_flexM, act_lrn,NFE121,FNFAET12JR1， FNFAET12NJR1,NFEHRS
+```
+
+#### 2-2 Stepwise AIC
+```{r}
+full.num<-lm(pvnumM~.,data=data_num)
+null.num<-lm(pvnumM~1,data=data_num)
+(step(null.num,scope = list(lower=null.num,upper=full.num), direction="forward", criterion 
+= "AIC", trace = F))$coefficients #ED_Level, act_lrn, Age, Gender, public/private, work_flexM, NFEHRS
+step(full.num,scope = list(lower=null.num), direction="backward", criterion 
+= "AIC", trace = F)
+```
+
+#### 2-3. Stepwise AIC (Only private)
+```{r only priv}
+data_priv_num<- data_num[data_num$pub_priv ==1 & (!is.na(data_num$pub_priv)), ][,-6]
+null.priv.num <- lm(pvnumM~1,data = data_priv_num)
+full.priv.num <- lm(pvnumM~.,data = data_priv_num)
+(step(null.priv.num, scope = list(lower=null.priv.num,upper=full.priv.num), direction="forward", criterion = "AIC",trace = F))$coefficients  
+#ED_Level, act_lrn, Age, Gender, work_flexM,NFEHRS
+```
+
+**Comment14: You use almost the same code, only change is the response variable. So my suggestions are the same as the last part.**
+#### 2-4. Model comparison
+1) check private/public sector 
+```{r priv/pub}
+lm.num.without<-lm(pvnumM ~ ED_Level + act_lrn + AGE_R + GENDER_R + 
+work_flexM + NFEHRS, data = data_num)
+lm.num.with<-lm(pvnumM ~ ED_Level + act_lrn + AGE_R + GENDER_R + 
+work_flexM + NFEHRS + pub_priv, data = data_num)
+
+summary(lm.num.with) #NFEHRS:0.13733
+anova(lm.num.without,lm.num.with)$`Pr(>F)`[2] # p-value = 0.0037**
+```
+
+2) ANOVA: With vs without one variable
+```{r anova}
+varlist <- names(data_num)[-10]
+models <- lapply(varlist, function(x) {
+anova(lm(pvnumM~.,data=data_num),lm(substitute(pvnumM ~. -i, list(i = as.name(x))), data =data_num))$`Pr(>F)`[2]
+})
+do.call(rbind, Map(data.frame, name=as.list(varlist), pvalue=models))
+```
+pub_priv,AGE_R,ED_Level,work_flexM,act_lrn,FNFAET12NJR
+
+
+3)
+```{r compare, eval=FALSE, include=FALSE}
+anova(lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R+ work_flexM + GENDER_R +pub_priv, data = data_num),lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R +  pub_priv +NFEHRS, data = data_num))$`Pr(>F)`[2] #NFEHRS:0.13303
+
+anova(lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R+ work_flexM + GENDER_R +pub_priv, data = data_num),lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R +  pub_priv +FNFAET12NJR, data = data_num))$`Pr(>F)`[2]  #FNFAET12NJR: 0.31301
+
+anova(lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R+ work_flexM + GENDER_R +pub_priv, data = data_num),lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R +  pub_priv +NFE12, data = data_num))$`Pr(>F)`[2] #NFE12: 0.45681
+
+anova(lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R+ work_flexM + GENDER_R +pub_priv, data = data_num),lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R +  pub_priv +FNFAET12JR, data = data_num))$`Pr(>F)`[2]  #FNFAET12JR: 0.7498
+
+anova(lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R+ work_flexM + GENDER_R +pub_priv, data = data_num),lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R +  pub_priv + Years_wk, data = data_num))$`Pr(>F)`[2] #Years_work: 0.40395
+
+anova(lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R+ work_flexM + GENDER_R +pub_priv, data = data_num),lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R +  pub_priv +FNFAET12JR + NFE12 + FNFAET12NJR , data = data_num))$`Pr(>F)`[2]  # 0.16506
+
+```
+
+**Comment15: Add some comments here. It's really hard for the readers to know what's going on in this part. Based on my understanding, you get two models A and B using stepwise AIC(forward and backward) and A is nested in B. Why not to use ANOVA to compare A and B first? As for the part 'ANOVA: With vs without one variable' I have some doubts about that. I give details in my comments of report. My suggestions are as follows: First, use anova to compare model A and B to find whether they are significantly different. If not, then delete NFEHRS from A and get the model C.(You can also delete any other one variable from A and use ANOVA to compare this model with A.) Use anova to compare A and C. Based on your results to draw some conclusions.**
+
+
+
+4)Final model check:
+```{r final_lit}
+summary(lm(formula = pvnumM ~ ED_Level + act_lrn + AGE_R+ work_flexM + 
+GENDER_R +pub_priv, data = data_num)) #all p-value < 0.05
+```
