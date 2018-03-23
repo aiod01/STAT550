@@ -1,0 +1,80 @@
+---
+title: "Initial_Analysis"
+author: "Nikolas Krstic"
+date: "March 14, 2018"
+output: html_document
+---
+
+```{r}
+library(haven)
+library(MASS)
+```
+
+```{r}
+##Data Cleaning
+wd = substr(getwd(), 1, nchar(getwd())-4)
+MAIN_data = read_sav(paste(wd, "/Data/Data-NFEHRS_revised.sav", sep=""))
+
+#Handle data artifacts
+MAIN_data[MAIN_data$num_use==7,]$num_use = NA
+MAIN_data[MAIN_data$ED_Level==8,]$ED_Level = 4
+
+#Boolean, which decides whether to combine classes of skill usage or convert them to sums
+collapsing=TRUE
+
+if(collapsing){
+  MAIN_data$num_use_new = floor(MAIN_data$num_use)
+  MAIN_data[MAIN_data$num_use_new %in% c(5),]$num_use_new = 4
+  MAIN_data$lit_use_new = floor(MAIN_data$liter_use)
+  MAIN_data[MAIN_data$lit_use_new %in% c(5),]$lit_use_new = 4
+}else{
+  MAIN_data$num_use_new = MAIN_data$num_use*18
+  MAIN_data$lit_use_new = MAIN_data$liter_use*12
+}
+  
+hist(MAIN_data$num_use_new)
+hist(MAIN_data$lit_use_new)
+
+FactorList = c("pub_priv", "GENDER_R", "ED_Level", "Full_part", "NFE12", "FNFAET12NJR", "FNFAET12JR",
+               "lit_use_new", "num_use_new")
+
+MAIN_data[FactorList] = lapply(MAIN_data[FactorList], as.factor)
+
+#Remove variables and make two datasets, one for each response type
+Var_Removal = c("AGEG5LFS", "AGEG10LFS", "Mgr", "Mgr_c", "pvlitM", "pvnumM", "FNFE12JR", "FNFAET12", "EMPloyed")
+
+Lit_data = MAIN_data[!(names(MAIN_data) %in% c("num_use_new", "liter_use", "num_use", Var_Removal))]
+Num_data = MAIN_data[!(names(MAIN_data) %in% c("lit_use_new", "liter_use", "num_use", Var_Removal))]
+
+Num_data_clean = na.omit(Num_data)
+Lit_data_clean = na.omit(Lit_data)
+
+#Check for Correlations
+Subset_Data = MAIN_data[,c("AGE_R","Years_wk","work_flexM","work_lrnM","act_lrn","NFEHRS","pvlitM","pvnumM")]
+CorrMatrix = cor(Subset_Data, use="pairwise.complete.obs")
+
+```
+
+```{r}
+##Ordinal Regression (Literacy)
+
+Null_Model_1 = polr(num_use_new~1, data=Num_data_clean, Hess=TRUE)
+Full_Model_1 = polr(num_use_new~., data=Num_data_clean, Hess=TRUE)
+
+Num_Model = step(Null_Model_1, trace=T, scope=list(upper = Full_Model_1, lower = Null_Model_1))
+
+
+##Ordinal Regression (Numeracy)
+
+Null_Model_2 = polr(lit_use_new~1, data=Lit_data_clean, Hess=TRUE)
+Full_Model_2 = polr(lit_use_new~., data=Lit_data_clean, Hess=TRUE)
+
+Liter_Model = step(Null_Model_2, trace=T, scope=list(upper = Full_Model_2, lower = Null_Model_2))
+
+
+```
+
+
+
+
+
