@@ -12,6 +12,7 @@ path<-paste(substr(s, 1, nchar(s)-4),"Data/Data-NFEHRS_revised.sav",sep = "")
 library(haven)
 Rawdata<- read_sav(path)  #1247
 ```
+**I think it is a nice way to start.**
 
 ## Data Pre-processing
 ### 1. Check Responses (Dependent variables)
@@ -19,6 +20,8 @@ Rawdata<- read_sav(path)  #1247
 summary(Rawdata$num_use)
 nrow(Rawdata[Rawdata$num_use==7,])  
 ```
+
+
 The max of num_use is 5 so I guessed 7 may be an artefact of the data. Also, there are other four missing value in this observation.Therefore, we would exclude this obervation(num_use=7).
 ```{r qqplot }
 newdata<- Rawdata[Rawdata$num_use!=7,]  #1246
@@ -40,7 +43,8 @@ summary(newdata$pvlitM)
 qqnorm(newdata$pvlitM)
 qqline(newdata$pvlitM)
 ```
-
+** It would be nice to make a table or data frame containing all the summary information just using one summary fucntion, such as summary(newdata)[,c(15,16,17,18)] . It would be nicer to add the title for each plot :)**
+#summary(newdata$num_use)
 The top left and top right Q-Q plot are not on a straight line. We might need some further transformation on the responses(num_use, liter_use)
  
 The bottom left and bottom right Q-Q plot seem on a straight line so it is fair to say that the two responses(pvnumM, pvlitM) of our sample are normal distributed. The assumption of linear regression is statisfied.
@@ -50,6 +54,7 @@ The bottom left and bottom right Q-Q plot seem on a straight line so it is fair 
 sum.data<-summary(newdata)[7,]
 sum.data[!is.na(sum.data)]
 ```
+** Wow This is very nice! interesting codes for me...**
 There are 501 missing value in the 'Mgr' column and 1015 missing value in the 'Mgr_c' colum, which contain both more than 40 % of the total number of the observations. I would suggest that progressing our regression analysis without these two variables first. There are 39 missing values in the 'pub_priv' and we don't know which sector they are.
 
 ### 3.Check Independent Variable
@@ -84,7 +89,11 @@ t.test(pvnumM~FNFAET12NJR, data = newdata)$p.value #p-value = 6.66e-06
 ##4.FNFE12JR and FNFAET12JR
 table(newdata$FNFE12JR == newdata$FNFAET12JR) #They are exactly the same: use one of them
 ```
-
+**-There is some typos on the first comment. When I checked it, only 4 observations have value 4.
+-Maybe it could be a good idea to show the union relationship between the three variables like this: 
+table(newdata\$FNFAET12==(newdata\$FNFAET12JR+newdata$FNFAET12NJR))
+- for the ##2 where you change the data type as factor, I think we can use simpler codes such as :newdata["pub_priv","GENDER_R","ED_Level","Full_part","NFE12","FNFE12JR","FNFAET12NJR","FNFAET12JR"] <- lapply(newdata["pub_priv","GENDER_R","ED_Level","Full_part","NFE12","FNFE12JR","FNFAET12NJR","FNFAET12JR"] , factor)
+**
 ### 4. Two dataset:
 ```{r two dataset}
 #1) proficiency test score(numeracy) + possbile factor
@@ -108,7 +117,7 @@ catcorrm <- function(categorical, newdata) sapply(categorical, function(y) sappl
 assocstats(table(unlist(newdata[,x]), unlist(newdata[,y])))$cramer))
 catcorrm(categorical,newdata) #only FNFAET12JR and NFE12 have very strong correlation(0.83376057)
 ```
-
+** We may need this too: if (!require('vcd')) install.packages('vcd') **
 ### 5.1 boxplot visualiztion - pvlitM
 ```{r}
 #anova
@@ -130,7 +139,7 @@ boxplot(pvlitM~NFE12,data=newdata, main="pvlitM vs None formal education", xlab=
 # pvlitM vs adult eduction
 boxplot(pvlitM~FNFAET12,data=newdata, main="pvlitM vs adult eduction", xlab="adult eduction", ylab="literacy score")
 ```
-
+**I think this code is fine. But if I have to give you a suggestion, I would recommend you to use for loop not to repeat the same codes.**
 ### 5.2 boxplot visualiztion - pvnumM
 ```{r}
 # pvnum vs gender
@@ -141,7 +150,7 @@ boxplot(pvnumM~Full_part,data=newdata, main="pvnumM vs full/part time", xlab="fu
 boxplot(pvnumM~ED_Level,data=newdata, main="pvnumM vs education", xlab="education", ylab="numeracy score")
 # pvnum vs work year
 ```
-
+**I think this is fine. We only have 3 box plots.**
 ## Methods
 ### 1. Literacy
 #### 1-1 Forward Adjusted R^2
@@ -153,7 +162,7 @@ summ.adjr_lit<-summary(adjr_lit)
 which.max(summ.adjr_lit$adjr2)#7
 # GENDER_R, AGE_R, ED_Level(3), pub_priv, work_flexM, act_lrn, NFEHRS
 ```
-
+**When I run the 'which.max(summ.adjr_lit$adjr2)', I got 8. I am not sure about what 7 means...**
 #### 1-2 Stepwise AIC 
 ```{r}
 table(newdata$pub_priv)
@@ -191,6 +200,7 @@ models <- lapply(varlist, function(x) {
 do.call(rbind, Map(data.frame, name=as.list(varlist), pvalue=models))
 ```
 Variables that P-value <0.05: pub_priv,AGE_R,ED_Level,work_flexM,act_lrn
+**This code is fine. You may also use drop1() function, just for your information.**
 
 3)
 ```{r compare}
