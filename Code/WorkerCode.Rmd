@@ -61,6 +61,7 @@ There are 501 missing value in the 'Mgr' column and 1015 missing value in the 'M
 ```{r independent} 
 ##1.ED_Level
 unique(newdata$ED_Level)
+
 table(newdata$ED_Level) #only one observation =8 and only 4 observations=3; change them to 3
 newdata<- within(newdata, ED_Level[ED_Level==8]<-3 )
 newdata<- within(newdata, ED_Level[ED_Level==4]<-3 )
@@ -157,9 +158,21 @@ boxplot(pvnumM~ED_Level,data=newdata, main="pvnumM vs education", xlab="educatio
 ```{r}
 library(leaps)
 options(digits=5)
-adjr_lit<-regsubsets(pvlitM~.,data=data_lit,nbest=1,method = c("forward"),nvmax=15)
+adjr_lit<-regsubsets(pvlitM~.,data=data_lit,nbest=1,nvmax = 14)
+?regsubsets
 summ.adjr_lit<-summary(adjr_lit)
-which.max(summ.adjr_lit$adjr2)#7
+summ.adjr_lit$adjr2
+summ.adjr_lit$cp
+which.max(summ.adjr_lit$adjr2)#8
+which.min(summ.adjr_lit$cp)#8
+
+par(mfrow=c(1,2))
+plot(adjr_lit, scale="adjr2")
+plot(adjr_lit, scale="Cp")
+
+
+
+summ.adjr_lit
 # GENDER_R, AGE_R, ED_Level(3), pub_priv, work_flexM, act_lrn, NFEHRS
 ```
 **When I run the 'which.max(summ.adjr_lit$adjr2)', I got 8. I am not sure about what 7 means...**
@@ -211,9 +224,10 @@ anova(lm(pvlitM~ED_Level + act_lrn + AGE_R + work_flexM + GENDER_R,data=data_lit
 ### 2. Numeracy
 #### 2-1 Forward Adjusted R^2
 ```{r}
-adjr_num<-regsubsets(pvnumM~.,data=data_num,nbest=1,method = c("forward"),nvmax=15)
+adjr_num<-regsubsets(pvnumM~.,data=data_num,nbest=1,method = c("exhaustive"),nvmax=16)
 summ.adjr_num<-summary(adjr_num)
 which.max(summ.adjr_num$adjr2)
+plot(adjr_num,scale = "adjr2")
 # GENDER_R, AGE_R, ED_Level, pub_priv, work_flexM, act_lrn,NFE121,FNFAET12JR1， FNFAET12NJR1,NFEHRS
 ```
 
