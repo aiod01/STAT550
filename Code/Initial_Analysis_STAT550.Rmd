@@ -8,6 +8,8 @@ output: html_document
 ```{r}
 library(haven)
 library(MASS)
+library(ordinal)
+library(leaps)
 ```
 
 ```{r}
@@ -41,7 +43,8 @@ FactorList = c("pub_priv", "GENDER_R", "ED_Level", "Full_part", "NFE12", "FNFAET
 MAIN_data[FactorList] = lapply(MAIN_data[FactorList], as.factor)
 
 #Remove variables and make two datasets, one for each response type
-Var_Removal = c("AGEG5LFS", "AGEG10LFS", "Mgr", "Mgr_c", "pvlitM", "pvnumM", "FNFE12JR", "FNFAET12", "EMPloyed")
+Var_Removal = c("AGEG5LFS", "AGEG10LFS", "Mgr", "Mgr_c", "pvlitM", "pvnumM", "FNFE12JR", "FNFAET12", "EMPloyed",
+                "FNFAET12JR", "FNFAET12NJR", "NFEHRS")
 
 Lit_data = MAIN_data[!(names(MAIN_data) %in% c("num_use_new", "liter_use", "num_use", Var_Removal))]
 Num_data = MAIN_data[!(names(MAIN_data) %in% c("lit_use_new", "liter_use", "num_use", Var_Removal))]
@@ -53,24 +56,74 @@ Lit_data_clean = na.omit(Lit_data)
 Subset_Data = MAIN_data[,c("AGE_R","Years_wk","work_flexM","work_lrnM","act_lrn","NFEHRS","pvlitM","pvnumM")]
 CorrMatrix = cor(Subset_Data, use="pairwise.complete.obs")
 
+#Eliminated both "FNFAET12NJR" and "FNFAET12JR" since they sum to make NFE12 (causing issues with modelling)
+table(as.numeric(MAIN_data$FNFAET12JR)+as.numeric(MAIN_data$FNFAET12NJR), MAIN_data$NFE12)
+table(MAIN_data$FNFAET12NJR, MAIN_data$NFE12)
+table(MAIN_data$FNFAET12NJR, MAIN_data$FNFAET12JR)
+
+table(MAIN_data$NFEHRS>0, MAIN_data$NFE12)
+
 ```
 
 ```{r}
-##Ordinal Regression (Literacy)
+##Ordinal Regression (Literacy) (Backward Selection)
 
-Null_Model_1 = polr(num_use_new~1, data=Num_data_clean, Hess=TRUE)
-Full_Model_1 = polr(num_use_new~., data=Num_data_clean, Hess=TRUE)
+Null_Model_1 = clm(num_use_new~1, data=Num_data_clean, Hess=TRUE)
+Full_Model_1 = clm(num_use_new~., data=Num_data_clean, Hess=TRUE)
 
-Num_Model = step(Null_Model_1, trace=T, scope=list(upper = Full_Model_1, lower = Null_Model_1))
+Num_Model = step(Full_Model_1, trace=T, scope=list(upper = Full_Model_1, lower = Null_Model_1))
 
 
-##Ordinal Regression (Numeracy)
+##Ordinal Regression (Numeracy) (Backward Selection)
 
-Null_Model_2 = polr(lit_use_new~1, data=Lit_data_clean, Hess=TRUE)
-Full_Model_2 = polr(lit_use_new~., data=Lit_data_clean, Hess=TRUE)
+Null_Model_2 = clm(lit_use_new~1, data=Lit_data_clean, Hess=TRUE)
+Full_Model_2 = clm(lit_use_new~., data=Lit_data_clean, Hess=TRUE)
 
-Liter_Model = step(Null_Model_2, trace=T, scope=list(upper = Full_Model_2, lower = Null_Model_2))
+Liter_Model = step(Full_Model_2, trace=T, scope=list(upper = Full_Model_2, lower = Null_Model_2))
 
+
+## Exhaustive model selection
+#NOTE: Make sure the response variable is the last column in your dataset (otherwise the function will not work)
+Exhaustive_OLR_Model_Selection = function(data){
+  
+  #Number of predictors
+  PredNum = ncol(data)-1
+  
+  #Subtract 1 because last combination is the null model
+  AICSet = rep(NA, 2^(PredNum)-1)
+  #iterate through every combination of predictors
+  for(i in 1:(2^(PredNum)-1)){
+    if(i%%100==0){
+      print(i)
+    }
+    #Obtain combination of variables for this 
+    VarNums = which(as.numeric(substr(as.character(intToBits(i)), 2,2))[1:PredNum]==1)
+    ResponseName = names(data)[ncol(data)]
+    PredictorNames = names(data)[VarNums]
+    
+    M_Formula = as.formula(paste(ResponseName, "~", paste(PredictorNames, collapse="+"), sep=""))
+    
+    Model = clm(M_Formula, data=data, Hess=TRUE)
+    
+    AICSet[i] = AIC(Model)
+  }
+  
+  Optim = which.min(AICSet)
+  
+  VarNums_F = which(as.numeric(substr(as.character(intToBits(Optim)), 2,2))[1:PredNum]==1)
+  ResponseName_F = names(data)[ncol(data)]
+  PredictorNames_F = names(data)[VarNums_F]
+    
+  M_Formula_F = as.formula(paste(ResponseName_F, "~", paste(PredictorNames_F, collapse="+"), sep=""))
+    
+  Model_F = clm(M_Formula_F, data=data, Hess=TRUE)
+    
+  return(Model_F)
+}
+
+#Results seem to suggest the results are the same as backward selection
+E_Model_Num = Exhaustive_OLR_Model_Selection(Num_data_clean)
+E_Model_Lit = Exhaustive_OLR_Model_Selection(Lit_data_clean)
 
 ```
 
