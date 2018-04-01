@@ -23,7 +23,7 @@ MAIN_data[MAIN_data$ED_Level==8,]$ED_Level = 4
 collapsing=TRUE
 
 if(collapsing){
-  MAIN_data$num_use_new = floor(MAIN_data$num_use)
+  MAIN_data$num_use_new = floor(MAIN_data$num_use)#change the floating points to 4 categories. We can see the num_use_new is changed to categories later.
   MAIN_data[MAIN_data$num_use_new %in% c(5),]$num_use_new = 4
   MAIN_data$lit_use_new = floor(MAIN_data$liter_use)
   MAIN_data[MAIN_data$lit_use_new %in% c(5),]$lit_use_new = 4
