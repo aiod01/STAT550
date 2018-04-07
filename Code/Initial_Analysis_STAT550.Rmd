@@ -10,6 +10,7 @@ library(haven)
 library(MASS)
 library(ordinal)
 library(leaps)
+library(rms)
 ```
 
 ```{r}
