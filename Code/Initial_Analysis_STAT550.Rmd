@@ -148,7 +148,6 @@ P_Model_Num<-polr(num_use_new ~ AGE_R + ED_Level + Full_part + Years_wk + pub_pr
 ```
 ```{r}
 #resid function in rms package to check the goodness of fit
-```{r}
 O_Model_Num<-orm(num_use_new ~ AGE_R + ED_Level + Full_part + Years_wk + pub_priv + work_flexM + work_lrnM + act_lrn + NFE12,data=Num_data_clean,x=TRUE,y=TRUE)
 #resid(test1, "partial", pl=TRUE)
 #resid(test1,"gof")
