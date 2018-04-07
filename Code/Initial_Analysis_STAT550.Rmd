@@ -178,10 +178,6 @@ trainset4<-Num_data_clean[-c(721:960),]
 trainset5<-Num_data_clean[-c(961:1207),]
 mylist<-list(trainset1,trainset2,trainset3,trainset4,trainset5)
 names(mylist)=c("trainset1","trainset2","trainset3","trainset4","trainset5")
-return_index<-function(x){
-	index<-which.max(x)
-	return(index)
-}
 ```
 
 ```{r}
