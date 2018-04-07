@@ -193,7 +193,7 @@ for(i in 1:5){
 	true_category<-list_fold[[i]]$num_use_new
   error[i]<-mean(as.vector(true_category)!=as.vector(pre_category))
 }
-mean(error) #0.4540385
+mean(error)
 ```
 
 ```{r}
@@ -226,7 +226,7 @@ for(i in 1:5){
 	true_category<-list_fold_lit[[i]]$lit_use_new
   error1[i]<-mean(as.vector(true_category)!=as.vector(pre_category))
 }
-mean(error1) #0.4038731
+mean(error1)
 ```
 
 
