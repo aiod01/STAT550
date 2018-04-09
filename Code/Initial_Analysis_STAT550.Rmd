@@ -54,7 +54,7 @@ Num_data_clean = na.omit(Num_data)
 Lit_data_clean = na.omit(Lit_data)
 
 #Check for Correlations
-Subset_Data = MAIN_data[,c("AGE_R","Years_wk","work_flexM","work_lrnM","act_lrn","NFEHRS","lit_use_new","pvnumM")]
+Subset_Data = MAIN_data[,c("AGE_R","Years_wk","work_flexM","work_lrnM","act_lrn","NFEHRS","pvlitM","pvnumM")]
 CorrMatrix = cor(Subset_Data, use="pairwise.complete.obs")
 
 #Eliminated both "FNFAET12NJR" and "FNFAET12JR" since they sum to make NFE12 (causing issues with modelling)
@@ -66,18 +66,23 @@ table(MAIN_data$NFEHRS>0, MAIN_data$NFE12)
 
 ```
 ```{r}
-#covariance plot for numerical variables.
-#I don't know why there is ? marks on the plot.
+#covariance plot for numerical variables-> No correlation
 newdata.numeric<-Subset_Data[,c("AGE_R","Years_wk","work_flexM","work_lrnM","act_lrn","NFEHRS","pvlitM","pvnumM")]
+newdata.numeric <- na.omit(newdata.numeric)
 m<-cor(newdata.numeric)
 if (!require('corrplot')) install.packages('corrplot')
 library('ggplot2')
 library(vcd)
 corrplot(m, method = "circle")
-#covariance matrix for categorical variables.
+#covariance matrix for categorical variables-> No correlation
+categorical<-c("GENDER_R","Full_part","ED_Level","pub_priv","NFE12","FNFAET12JR","FNFAET12NJR")
 catcorrm <- function(categorical, MAIN_data) sapply(categorical, function(y) sapply(categorical, function(x) 
 assocstats(table(unlist(newdata[,x]), unlist(newdata[,y])))$cramer))
-catcorrm(categorical,newdata) 
+catcorrm(categorical,MAIN_data) 
+#only FNFAET12JR and NFE12 have very strong correlation(0.83376057)
+
+
+
 ```
 ```{r}
 #bar plot for two response variables.
@@ -88,22 +93,31 @@ ggplot(MAIN_data, aes(x=lit_use_new)) +
   geom_bar(color="blue", fill="white")
 ```
 ```{r}
-boxplot(lit_use_new~GENDER_R,data=MAIN_data, main="gender vs lit_use_new", xlab="gender", ylab="literacy score")
+FactorList = c("lit_use_new", "num_use_new")
+
+MAIN_data[FactorList] = lapply(MAIN_data[FactorList], as.numeric)
+# lit_use_new vs gender
+(ggplot(MAIN_data, aes(y=lit_use_new, x=GENDER_R,color=GENDER_R)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
 
 # lit_use_new vs full/part time
-boxplot(lit_use_new~Full_part,data=MAIN_data, main="lit_use_new vs full/part time", xlab="full/part time", ylab="literacy score")
+(ggplot(MAIN_data, aes(y=lit_use_new, x=Full_part,color=Full_part)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4,color='blue')+ geom_jitter(shape=1, position=position_jitter(0.3)))
+#boxplot(lit_use_new~Full_part,data=MAIN_data, main="lit_use_new vs full/part time", xlab="full/part time", ylab="literacy score")
 
 # lit_use_new vs education
-boxplot(lit_use_new~ED_Level,data=MAIN_data, main="lit_use_new vs education", xlab="education", ylab="literacy score")
+(ggplot(MAIN_data, aes(y=lit_use_new, x=ED_Level, color=ED_Level)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
+#boxplot(lit_use_new~ED_Level,data=MAIN_data, main="lit_use_new vs education", xlab="education", ylab="literacy score")
 
 # lit_use_new vs private/public
-boxplot(lit_use_new~pub_priv,data=MAIN_data, main="lit_use_new vs private/public sector", xlab="private/public sector", ylab="literacy score")
+(ggplot(MAIN_data, aes(y=lit_use_new, x=pub_priv, color=pub_priv)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
+#boxplot(lit_use_new~pub_priv,data=MAIN_data, main="lit_use_new vs private/public sector", xlab="private/public sector", ylab="literacy score")
 
 # lit_use_new vs None formal education
-boxplot(lit_use_new~NFE12,data=MAIN_data, main="lit_use_new vs None formal education", xlab="None formal education", ylab="literacy score")
+(ggplot(MAIN_data, aes(y=lit_use_new, x=NFE12,color=NFE12)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
+#boxplot(lit_use_new~NFE12,data=MAIN_data, main="lit_use_new vs None formal education", xlab="None formal education", ylab="literacy score")
 
 # lit_use_new vs adult eduction
-boxplot(lit_use_new~FNFAET12,data=MAIN_data, main="lit_use_new vs adult eduction", xlab="adult eduction", ylab="literacy score")
+(ggplot(MAIN_data, aes(y=lit_use_new, x=FNFAET12, group=FNFAET12,color=FNFAET12)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
+#boxplot(lit_use_new~FNFAET12,data=MAIN_data, main="lit_use_new vs adult eduction", xlab="adult eduction", ylab="literacy score")
 ```
 
 
