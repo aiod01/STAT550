@@ -11,6 +11,7 @@ library(haven)
 library(MASS)
 library(ordinal)
 library(leaps)
+library(rms)
 ```
 
 ```{r}
@@ -182,8 +183,100 @@ E_Model_Num = Exhaustive_OLR_Model_Selection(Num_data_clean)
 E_Model_Lit = Exhaustive_OLR_Model_Selection(Lit_data_clean)
 
 ```
+```{r}
+#model diagnostics
+#check convergence of the model
+convergence(E_Model_Lit)
+convergence(E_Model_Num)
+```
+```{r}
+#these tests can be viewed as goodness-of-fit tests. With the logit link, nominal_test provides likelihood ratio tests of the proportional odds assumption.
+T_Model_Lit<-clm(lit_use_new ~ GENDER_R + AGE_R + ED_Level + Full_part + self_employed + pub_priv + work_flexM + work_lrnM + act_lrn + NFE12,data=Lit_data_clean)
+T_Model_Num<-clm(num_use_new ~ AGE_R + ED_Level + Full_part + Years_wk + pub_priv + work_flexM + work_lrnM + act_lrn + NFE12,data=Num_data_clean)
+#the proportional oadds assumption test for literacy model
+nominal_test(T_Model_Lit)
+#the proportional oadds assumption test for numeracy model
+nominal_test(T_Model_Num)
+```
+```{r}
+#deviance test for goodness of fit
+P_Model_Num<-polr(num_use_new ~ AGE_R + ED_Level + Full_part + Years_wk + pub_priv + work_flexM + work_lrnM + act_lrn + NFE12,data=Num_data_clean)
+1-pchisq(deviance(P_Model_Num),df.residual(P_Model_Num))
+```
+```{r}
+#resid function in rms package to check the goodness of fit
+O_Model_Num<-orm(num_use_new ~ AGE_R + ED_Level + Full_part + Years_wk + pub_priv + work_flexM + work_lrnM + act_lrn + NFE12,data=Num_data_clean,x=TRUE,y=TRUE)
+#resid(test1, "partial", pl=TRUE)
+#resid(test1,"gof")
+#resid(test1, 'score.binary', pl=TRUE) #plot score residuals
+#resid(test1,'partial',pl=TRUE)
+O_Model_Lit<-orm(lit_use_new ~ GENDER_R + AGE_R + ED_Level + Full_part + self_employed + pub_priv + work_flexM + work_lrnM + act_lrn + NFE12, data=Lit_data_clean,x=TRUE,y=TRUE)
+resid(O_Model_Num, 'gof')
+resid(O_Model_Lit,'gof')
+```
+```{r}
+#prediction accuracy using 5-fold cross validation
+#split the data into 5 datasets
+fold1<-Num_data_clean[1:240,]
+fold2<-Num_data_clean[241:480,]
+fold3<-Num_data_clean[481:720,]
+fold4<-Num_data_clean[721:960,]
+fold5<-Num_data_clean[961:1207,]
+list_fold<-list(fold1,fold2,fold3,fold4,fold5)
+names(list_fold)=c("fold1","fold2","fold3","fold4","fold5")
+#E_Model_Num
+#formula
+formula1<-as.formula(num_use_new ~ AGE_R + ED_Level + Full_part + Years_wk + pub_priv + work_flexM + work_lrnM + act_lrn + NFE12)
+##construct 5 models
+trainset1<-Num_data_clean[-c(1:240),]
+trainset2<-Num_data_clean[-c(241:480),]
+trainset3<-Num_data_clean[-c(481:720),]
+trainset4<-Num_data_clean[-c(721:960),]
+trainset5<-Num_data_clean[-c(961:1207),]
+mylist<-list(trainset1,trainset2,trainset3,trainset4,trainset5)
+names(mylist)=c("trainset1","trainset2","trainset3","trainset4","trainset5")
+```
 
+```{r}
+error<-rep(0,5)
+for(i in 1:5){
+	model<-clm(formula1, data=mylist[[i]],Hess=TRUE)
+	pre_category<-predict(model, newdata=list_fold[[i]][,1:11],type="class")$fit
+	true_category<-list_fold[[i]]$num_use_new
+  error[i]<-mean(as.vector(true_category)!=as.vector(pre_category))
+}
+mean(error)
+```
 
+```{r}
+#5-cross validation for literacy
+L_fold1<-Lit_data_clean[1:240,]
+L_fold2<-Lit_data_clean[241:480,]
+L_fold3<-Lit_data_clean[481:720,]
+L_fold4<-Lit_data_clean[721:960,]
+L_fold5<-Lit_data_clean[961:1207,]
+list_fold_lit<-list(L_fold1,L_fold2,L_fold3,L_fold4,L_fold5)
+names(list_fold)=c("fold1","fold2","fold3","fold4","fold5")
+#E_Model_Lit
+#formula
+formula2<-as.formula(lit_use_new ~ GENDER_R + AGE_R + ED_Level + Full_part + self_employed + pub_priv + work_flexM + work_lrnM + act_lrn + NFE12)
+##construct 5 models
+L_trainset1<-Lit_data_clean[-c(1:240),]
+L_trainset2<-Lit_data_clean[-c(241:480),]
+L_trainset3<-Lit_data_clean[-c(481:720),]
+L_trainset4<-Lit_data_clean[-c(721:960),]
+L_trainset5<-Lit_data_clean[-c(961:1207),]
+L_mylist<-list(L_trainset1,L_trainset2,L_trainset3,L_trainset4,L_trainset5)
+names(mylist)=c("trainset1","trainset2","trainset3","trainset4","trainset5")
+```
 
-
-
+```{r}
+error1<-rep(0,5)
+for(i in 1:5){
+	model1<-clm(formula2, data=L_mylist[[i]],Hess=TRUE)
+	pre_category<-predict(model, newdata=list_fold_lit[[i]][,1:11],type="class")$fit
+	true_category<-list_fold_lit[[i]]$lit_use_new
+  error1[i]<-mean(as.vector(true_category)!=as.vector(pre_category))
+}
+mean(error1)
+```
