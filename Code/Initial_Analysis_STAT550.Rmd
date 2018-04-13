@@ -7,6 +7,7 @@ output: html_document
 
 ```{r}
 if (!require('ordinal')) install.packages('ordinal')
+if (!require('rms')) install.packages('rms')
 library(haven)
 library(MASS)
 library(ordinal)
@@ -45,7 +46,7 @@ FactorList = c("pub_priv", "GENDER_R", "ED_Level", "Full_part", "NFE12", "FNFAET
 MAIN_data[FactorList] = lapply(MAIN_data[FactorList], as.factor)
 
 #Remove variables and make two datasets, one for each response type
-Var_Removal = c("AGEG5LFS", "AGEG10LFS", "Mgr", "Mgr_c", "lit_use_new", "pvnumM", "FNFE12JR", "FNFAET12", "EMPloyed",
+Var_Removal = c("AGEG5LFS", "AGEG10LFS", "Mgr", "Mgr_c", "pvnumM", "FNFE12JR", "FNFAET12", "EMPloyed",
                 "FNFAET12JR", "FNFAET12NJR", "NFEHRS")
 
 Lit_data = MAIN_data[!(names(MAIN_data) %in% c("num_use_new", "liter_use", "num_use", Var_Removal))]
@@ -55,7 +56,9 @@ Num_data_clean = na.omit(Num_data)
 Lit_data_clean = na.omit(Lit_data)
 
 #Check for Correlations
-Subset_Data = MAIN_data[,c("AGE_R","Years_wk","work_flexM","work_lrnM","act_lrn","NFEHRS","pvlitM","pvnumM")]
+Subset_Data = MAIN_data[,c("AGE_R","Years_wk","work_flexM","work_lrnM","act_lrn","NFEHRS")]
+numericlist = c("lit_use_new", "num_use_new")
+Subset_Data[numericlist] = lapply(MAIN_data[numericlist], as.numeric)
 CorrMatrix = cor(Subset_Data, use="pairwise.complete.obs")
 
 #Eliminated both "FNFAET12NJR" and "FNFAET12JR" since they sum to make NFE12 (causing issues with modelling)
@@ -68,17 +71,27 @@ table(MAIN_data$NFEHRS>0, MAIN_data$NFE12)
 ```
 ```{r}
 #covariance plot for numerical variables-> No correlation
-newdata.numeric<-Subset_Data[,c("AGE_R","Years_wk","work_flexM","work_lrnM","act_lrn","NFEHRS","pvlitM","pvnumM")]
-newdata.numeric <- na.omit(newdata.numeric)
-m<-cor(newdata.numeric)
+#newdata.numeric<-Subset_Data[,c("AGE_R","Years_wk","work_flexM","work_lrnM","act_lrn","NFEHRS","pvlitM","pvnumM")]
+numericlist = c("lit_use_new", "num_use_new")
+
+Subset_Data[numericlist] = lapply(MAIN_data[numericlist], as.numeric)
+
+Subset_Data <- na.omit(Subset_Data)
+#as.numeric()
+m<-cor(Subset_Data)
 if (!require('corrplot')) install.packages('corrplot')
 library('ggplot2')
 library(vcd)
 corrplot(m, method = "circle")
 #covariance matrix for categorical variables-> No correlation
-categorical<-c("GENDER_R","Full_part","ED_Level","pub_priv","NFE12","FNFAET12JR","FNFAET12NJR")
-catcorrm <- function(categorical, MAIN_data) sapply(categorical, function(y) sapply(categorical, function(x) 
-assocstats(table(unlist(newdata[,x]), unlist(newdata[,y])))$cramer))
+categorical<-c("pub_priv", "GENDER_R", "ED_Level", "Full_part", "NFE12", "lit_use_new", "num_use_new")
+catcorrm <- function(categorical, MAIN_data) {
+  sapply(categorical, function(y) {
+    sapply(categorical, function(x) {
+assocstats(table(unlist(MAIN_data[,x]), unlist(MAIN_data[,y])))$cramer
+      })
+    })
+  }
 catcorrm(categorical,MAIN_data) 
 #only FNFAET12JR and NFE12 have very strong correlation(0.83376057)
 
@@ -87,11 +100,11 @@ catcorrm(categorical,MAIN_data)
 ```
 ```{r}
 #bar plot for two response variables.
-ggplot(MAIN_data, aes(x=num_use_new)) + 
-  geom_bar(color="red", fill="white")
-
-ggplot(MAIN_data, aes(x=lit_use_new)) + 
-  geom_bar(color="blue", fill="white")
+MAIN_data_response=MAIN_data[c('num_use_new','lit_use_new')]
+MAIN_data_response=na.omit(MAIN_data_response)
+ggplot(MAIN_data_response) + 
+  geom_bar(aes(x=num_use_new), color="black", fill="grey",alpha = 0.8)+ geom_bar(aes(x=lit_use_new),color="red", fill="red",alpha = 0.1)+labs(caption = "Red bar=Literacy
+                                                                                                                                              Grey bar= Numeracy", x="Scaled score",y="Count")
 ```
 ```{r}
 FactorList = c("lit_use_new", "num_use_new")
@@ -101,25 +114,22 @@ MAIN_data[FactorList] = lapply(MAIN_data[FactorList], as.numeric)
 (ggplot(MAIN_data, aes(y=lit_use_new, x=GENDER_R,color=GENDER_R)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
 
 # lit_use_new vs full/part time
-(ggplot(MAIN_data, aes(y=lit_use_new, x=Full_part,color=Full_part)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4,color='blue')+ geom_jitter(shape=1, position=position_jitter(0.3)))
-#boxplot(lit_use_new~Full_part,data=MAIN_data, main="lit_use_new vs full/part time", xlab="full/part time", ylab="literacy score")
+(ggplot(MAIN_data, aes(y=lit_use_new, x=Full_part,color=Full_part)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4,color='blue'))
+
 
 # lit_use_new vs education
 (ggplot(MAIN_data, aes(y=lit_use_new, x=ED_Level, color=ED_Level)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
-#boxplot(lit_use_new~ED_Level,data=MAIN_data, main="lit_use_new vs education", xlab="education", ylab="literacy score")
 
+#MAIN_data_response=na.omit(MAIN_data_response)
 # lit_use_new vs private/public
-(ggplot(MAIN_data, aes(y=lit_use_new, x=pub_priv, color=pub_priv)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
-#boxplot(lit_use_new~pub_priv,data=MAIN_data, main="lit_use_new vs private/public sector", xlab="private/public sector", ylab="literacy score")
+
+(ggplot(na.omit(MAIN_data[c('lit_use_new','pub_priv')]), aes(y=lit_use_new, x=pub_priv, color=pub_priv)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
 
 # lit_use_new vs None formal education
 (ggplot(MAIN_data, aes(y=lit_use_new, x=NFE12,color=NFE12)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
-#boxplot(lit_use_new~NFE12,data=MAIN_data, main="lit_use_new vs None formal education", xlab="None formal education", ylab="literacy score")
 
-# lit_use_new vs adult eduction
-(ggplot(MAIN_data, aes(y=lit_use_new, x=FNFAET12, group=FNFAET12,color=FNFAET12)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
-#boxplot(lit_use_new~FNFAET12,data=MAIN_data, main="lit_use_new vs adult eduction", xlab="adult eduction", ylab="literacy score")
 ```
+
 
 
 ```{r}
