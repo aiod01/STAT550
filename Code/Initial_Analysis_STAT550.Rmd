@@ -127,7 +127,25 @@ MAIN_data[FactorList] = lapply(MAIN_data[FactorList], as.numeric)
 
 # lit_use_new vs None formal education
 (ggplot(MAIN_data, aes(y=lit_use_new, x=NFE12,color=NFE12)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
+###################
 
+# num_use_new vs gender
+(ggplot(MAIN_data, aes(y=num_use_new, x=GENDER_R,color=GENDER_R)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
+
+# lit_use_new vs full/part time
+(ggplot(MAIN_data, aes(y=num_use_new, x=Full_part,color=Full_part)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4,color='blue'))
+
+
+# lit_use_new vs education
+(ggplot(MAIN_data, aes(y=num_use_new, x=ED_Level, color=ED_Level)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
+
+#MAIN_data_response=na.omit(MAIN_data_response)
+# lit_use_new vs private/public
+
+(ggplot(na.omit(MAIN_data[c('num_use_new','pub_priv')]), aes(y=num_use_new, x=pub_priv, color=pub_priv)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
+
+# lit_use_new vs None formal education
+(ggplot(MAIN_data, aes(y=num_use_new, x=NFE12,color=NFE12)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
 ```
 
 
