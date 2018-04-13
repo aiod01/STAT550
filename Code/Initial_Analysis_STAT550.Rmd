@@ -102,9 +102,10 @@ catcorrm(categorical,MAIN_data)
 #bar plot for two response variables.
 MAIN_data_response=MAIN_data[c('num_use_new','lit_use_new')]
 MAIN_data_response=na.omit(MAIN_data_response)
-ggplot(MAIN_data_response) + 
+a <- ggplot(MAIN_data_response) + 
   geom_bar(aes(x=num_use_new), color="black", fill="grey",alpha = 0.8)+ geom_bar(aes(x=lit_use_new),color="red", fill="red",alpha = 0.1)+labs(caption = "Red bar=Literacy
                                                                                                                                               Grey bar= Numeracy", x="Scaled score",y="Count")
+a
 ```
 ```{r}
 FactorList = c("lit_use_new", "num_use_new")
@@ -118,15 +119,16 @@ MAIN_data[FactorList] = lapply(MAIN_data[FactorList], as.numeric)
 
 
 # lit_use_new vs education
-(ggplot(MAIN_data, aes(y=lit_use_new, x=ED_Level, color=ED_Level)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
-
+b <- ggplot(MAIN_data, aes(y=lit_use_new, x=ED_Level, color=ED_Level)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4)
+b
 #MAIN_data_response=na.omit(MAIN_data_response)
 # lit_use_new vs private/public
 
-(ggplot(na.omit(MAIN_data[c('lit_use_new','pub_priv')]), aes(y=lit_use_new, x=pub_priv, color=pub_priv)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
-
+c <- ggplot(na.omit(MAIN_data[c('lit_use_new','pub_priv')]), aes(y=lit_use_new, x=pub_priv, color=pub_priv)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4)
+c
 # lit_use_new vs None formal education
-(ggplot(MAIN_data, aes(y=lit_use_new, x=NFE12,color=NFE12)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
+d <- ggplot(MAIN_data, aes(y=lit_use_new, x=NFE12,color=NFE12)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4)
+d
 ###################
 
 # num_use_new vs gender
@@ -148,6 +150,15 @@ MAIN_data[FactorList] = lapply(MAIN_data[FactorList], as.numeric)
 (ggplot(MAIN_data, aes(y=num_use_new, x=NFE12,color=NFE12)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
 ```
 
+```{r}
+if(!require(devtools)) install.packages("devtools")
+devtools::install_github("kassambara/ggpubr")
+library(ggpubr)
+#meaningful plots
+ggarrange(a, b, c,d + rremove("x.text"), 
+          labels = c("A", "B", "C","D"),
+          ncol = 2, nrow = 2)
+```
 
 
 ```{r}
