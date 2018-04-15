@@ -237,13 +237,9 @@ nominal_test(T_Model_Lit)
 #the proportional oadds assumption test for numeracy model
 nominal_test(T_Model_Num)
 ```
+
 ```{r}
-#deviance test for goodness of fit
-P_Model_Num<-polr(num_use_new ~ AGE_R + ED_Level + Full_part + Years_wk + pub_priv + work_flexM + work_lrnM + act_lrn + NFE12,data=Num_data_clean)
-1-pchisq(deviance(P_Model_Num),df.residual(P_Model_Num))
-```
-```{r}
-#resid function in rms package to check the goodness of fit
+#resid function in rms package to check the goodness of fit, just a demo for inspiration
 O_Model_Num<-orm(num_use_new ~ AGE_R + ED_Level + Full_part + Years_wk + pub_priv + work_flexM + work_lrnM + act_lrn + NFE12,data=Num_data_clean,x=TRUE,y=TRUE)
 #resid(test1, "partial", pl=TRUE)
 #resid(test1,"gof")
@@ -253,6 +249,7 @@ O_Model_Lit<-orm(lit_use_new ~ GENDER_R + AGE_R + ED_Level + Full_part + self_em
 resid(O_Model_Num, 'gof')
 resid(O_Model_Lit,'gof')
 ```
+
 ```{r}
 #prediction accuracy using 5-fold cross validation
 #split the data into 5 datasets
