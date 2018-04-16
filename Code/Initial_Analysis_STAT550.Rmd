@@ -243,4 +243,3 @@ nominal_test(T_Model_Lit)
 #the proportional oadds assumption test for numeracy model
 nominal_test(T_Model_Num)
 ```
-
