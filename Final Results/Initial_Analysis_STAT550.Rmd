@@ -1,0 +1,242 @@
+---
+title: "Initial_Analysis"
+author: "Nikolas Krstic, Xinyao Fan, Tom Hyeongcheol Park"
+date: "March 14, 2018"
+output: github_document
+---
+
+```{r, message=FALSE, warning=FALSE}
+if (!require('ordinal')) install.packages('ordinal')
+if (!require('rms')) install.packages('rms')
+if (!require('corrplot')) install.packages('corrplot')
+if (!require(devtools)) install.packages("devtools")
+library(haven)
+library(MASS)
+library(ordinal)
+library(leaps)
+library(rms)
+devtools::install_github("kassambara/ggpubr")
+library(ggpubr)
+library(ggplot2)
+library(vcd)
+```
+
+## Data Cleaning
+```{r}
+##Data Cleaning
+wd = substr(getwd(), 1, nchar(getwd())-4)
+MAIN_data = read_sav(paste(wd, "/Data/Data-NFEHRS_revised.sav", sep=""))
+
+#Handle data artifacts
+MAIN_data[MAIN_data$num_use==7,]$num_use = NA
+MAIN_data[MAIN_data$ED_Level==8,]$ED_Level = 4
+
+#Boolean, which decides whether to combine classes of skill usage or convert them to sums
+collapsing=TRUE
+
+if(collapsing){
+  MAIN_data$num_use_new = floor(MAIN_data$num_use)#change the floating points to 4 categories. We can see the num_use_new is changed to categories later.
+  MAIN_data[MAIN_data$num_use_new %in% c(5),]$num_use_new = 4
+  MAIN_data$lit_use_new = floor(MAIN_data$liter_use)
+  MAIN_data[MAIN_data$lit_use_new %in% c(5),]$lit_use_new = 4
+}else{
+  MAIN_data$num_use_new = MAIN_data$num_use*18
+  MAIN_data$lit_use_new = MAIN_data$liter_use*12
+}
+  
+FactorList = c("pub_priv", "GENDER_R", "ED_Level", "Full_part", "NFE12", "FNFAET12NJR", "FNFAET12JR",
+               "lit_use_new", "num_use_new")
+
+MAIN_data[FactorList] = lapply(MAIN_data[FactorList], as.factor)
+
+#Remove variables and make two datasets, one for each response type
+Var_Removal = c("AGEG5LFS", "AGEG10LFS", "Mgr", "Mgr_c", "pvlitM", "pvnumM", "FNFE12JR", "FNFAET12", "EMPloyed",
+                "FNFAET12JR", "FNFAET12NJR", "NFEHRS")
+
+Lit_data = MAIN_data[!(names(MAIN_data) %in% c("num_use_new", "liter_use", "num_use", Var_Removal))]
+Num_data = MAIN_data[!(names(MAIN_data) %in% c("lit_use_new", "liter_use", "num_use", Var_Removal))]
+
+Num_data_clean = na.omit(Num_data)
+Lit_data_clean = na.omit(Lit_data)
+
+#Check for Correlations
+Subset_Data = MAIN_data[,c("AGE_R","Years_wk","work_flexM","work_lrnM","act_lrn","NFEHRS")]
+numericlist = c("lit_use_new", "num_use_new")
+Subset_Data[numericlist] = lapply(MAIN_data[numericlist], as.numeric)
+CorrMatrix = cor(Subset_Data, use="pairwise.complete.obs")
+
+#Eliminated both "FNFAET12NJR" and "FNFAET12JR" since they sum to make NFE12 (causing issues with modelling)
+table(as.numeric(MAIN_data$FNFAET12JR)+as.numeric(MAIN_data$FNFAET12NJR), MAIN_data$NFE12)
+table(MAIN_data$FNFAET12NJR, MAIN_data$NFE12)
+table(MAIN_data$FNFAET12NJR, MAIN_data$FNFAET12JR)
+
+table(MAIN_data$NFEHRS>0, MAIN_data$NFE12)
+
+```
+
+## Model Selection
+```{r, message=FALSE, warning=FALSE, results='hide'}
+##Ordinal Regression (Literacy) (Backward Selection)
+
+Null_Model_1 = clm(num_use_new~1, data=Num_data_clean, Hess=TRUE)
+Full_Model_1 = clm(num_use_new~., data=Num_data_clean, Hess=TRUE)
+
+Num_Model = step(Full_Model_1, trace=T, scope=list(upper = Full_Model_1, lower = Null_Model_1))
+
+
+##Ordinal Regression (Numeracy) (Backward Selection)
+
+Null_Model_2 = clm(lit_use_new~1, data=Lit_data_clean, Hess=TRUE)
+Full_Model_2 = clm(lit_use_new~., data=Lit_data_clean, Hess=TRUE)
+
+Liter_Model = step(Full_Model_2, trace=T, scope=list(upper = Full_Model_2, lower = Null_Model_2))
+
+
+## Exhaustive model selection
+#NOTE: Make sure the response variable is the last column in your dataset (otherwise the function will not work)
+Exhaustive_OLR_Model_Selection = function(data){
+  
+  #Number of predictors
+  PredNum = ncol(data)-1
+  
+  #Subtract 1 because last combination is the null model
+  AICSet = rep(NA, 2^(PredNum)-1)
+  #iterate through every combination of predictors
+  for(i in 1:(2^(PredNum)-1)){
+    if(i%%100==0){
+      print(i)
+    }
+    #Obtain combination of variables for this 
+    VarNums = which(as.numeric(substr(as.character(intToBits(i)), 2,2))[1:PredNum]==1)
+    ResponseName = names(data)[ncol(data)]
+    PredictorNames = names(data)[VarNums]
+    
+    M_Formula = as.formula(paste(ResponseName, "~", paste(PredictorNames, collapse="+"), sep=""))
+    
+    Model = clm(M_Formula, data=data, Hess=TRUE)
+    
+    AICSet[i] = AIC(Model)
+  }
+  
+  Optim = which.min(AICSet)
+  
+  VarNums_F = which(as.numeric(substr(as.character(intToBits(Optim)), 2,2))[1:PredNum]==1)
+  ResponseName_F = names(data)[ncol(data)]
+  PredictorNames_F = names(data)[VarNums_F]
+    
+  M_Formula_F = as.formula(paste(ResponseName_F, "~", paste(PredictorNames_F, collapse="+"), sep=""))
+    
+  Model_F = clm(M_Formula_F, data=data, Hess=TRUE)
+    
+  return(Model_F)
+}
+
+#Results seem to suggest the results are the same as backward selection
+E_Model_Num = Exhaustive_OLR_Model_Selection(Num_data_clean)
+E_Model_Lit = Exhaustive_OLR_Model_Selection(Lit_data_clean)
+
+```
+
+## Exploratory Analysis
+```{r}
+#covariance plot for numerical variables-> No correlation
+#newdata.numeric<-Subset_Data[,c("AGE_R","Years_wk","work_flexM","work_lrnM","act_lrn","NFEHRS","pvlitM","pvnumM")]
+numericlist = c("lit_use_new", "num_use_new")
+
+Subset_Data[numericlist] = lapply(MAIN_data[numericlist], as.numeric)
+
+Subset_Data <- na.omit(Subset_Data)
+#as.numeric()
+m<-cor(Subset_Data)
+corrplot(m, method = "circle")
+#covariance matrix for categorical variables-> No correlation
+categorical<-c("pub_priv", "GENDER_R", "ED_Level", "Full_part", "NFE12", "lit_use_new", "num_use_new")
+catcorrm <- function(categorical, MAIN_data) {
+  sapply(categorical, function(y) {
+    sapply(categorical, function(x) {
+assocstats(table(unlist(MAIN_data[,x]), unlist(MAIN_data[,y])))$cramer
+      })
+    })
+  }
+catcorrm(categorical,MAIN_data) 
+#only FNFAET12JR and NFE12 have very strong correlation(0.83376057)
+
+```
+
+```{r}
+#bar plot for two response variables.
+MAIN_data_response=MAIN_data[c('num_use_new','lit_use_new')]
+MAIN_data_response=na.omit(MAIN_data_response)
+a <- ggplot(MAIN_data_response) + 
+  geom_bar(aes(x=num_use_new), color="black", fill="grey",alpha = 0.8)+ geom_bar(aes(x=lit_use_new),color="red", fill="red",alpha = 0.1)+labs(caption = "Red bar=Literacy
+                                                                                                                                              Grey bar= Numeracy", x="Scaled score",y="Count")
+a
+```
+
+```{r}
+FactorList = c("lit_use_new", "num_use_new")
+
+MAIN_data[FactorList] = lapply(MAIN_data[FactorList], as.numeric)
+# lit_use_new vs gender
+(ggplot(MAIN_data, aes(y=lit_use_new, x=GENDER_R,color=GENDER_R)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
+
+# lit_use_new vs full/part time
+(ggplot(MAIN_data, aes(y=lit_use_new, x=Full_part,color=Full_part)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4,color='blue'))
+
+
+# lit_use_new vs education
+b <- ggplot(MAIN_data, aes(y=lit_use_new, x=ED_Level, color=ED_Level)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4)
+b
+#MAIN_data_response=na.omit(MAIN_data_response)
+# lit_use_new vs private/public
+
+c <- ggplot(na.omit(MAIN_data[c('lit_use_new','pub_priv')]), aes(y=lit_use_new, x=pub_priv, color=pub_priv)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4)
+c
+# lit_use_new vs None formal education
+d <- ggplot(MAIN_data, aes(y=lit_use_new, x=NFE12,color=NFE12)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4)
+d
+###################
+
+# num_use_new vs gender
+(ggplot(MAIN_data, aes(y=num_use_new, x=GENDER_R,color=GENDER_R)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
+
+# lit_use_new vs full/part time
+(ggplot(MAIN_data, aes(y=num_use_new, x=Full_part,color=Full_part)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4,color='blue'))
+
+
+# lit_use_new vs education
+(ggplot(MAIN_data, aes(y=num_use_new, x=ED_Level, color=ED_Level)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
+
+#MAIN_data_response=na.omit(MAIN_data_response)
+# lit_use_new vs private/public
+
+(ggplot(na.omit(MAIN_data[c('num_use_new','pub_priv')]), aes(y=num_use_new, x=pub_priv, color=pub_priv)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
+
+# lit_use_new vs None formal education
+(ggplot(MAIN_data, aes(y=num_use_new, x=NFE12,color=NFE12)) + geom_boxplot()+stat_summary(fun.y=mean, geom="point", shape=23, size=4))
+```
+
+```{r}
+#meaningful plots
+ggarrange(a, b, c,d + rremove("x.text"), 
+          labels = c("A", "B", "C","D"),
+          ncol = 2, nrow = 2)
+```
+
+## Model Diagnostics
+```{r}
+#model diagnostics
+#check convergence of the model
+convergence(E_Model_Lit)
+convergence(E_Model_Num)
+```
+
+```{r}
+#these tests can be viewed as goodness-of-fit tests. With the logit link, nominal_test provides likelihood ratio tests of the proportional odds assumption.
+T_Model_Lit<-clm(lit_use_new ~ GENDER_R + AGE_R + ED_Level + Full_part + self_employed + pub_priv + work_flexM + work_lrnM + act_lrn + NFE12,data=Lit_data_clean)
+T_Model_Num<-clm(num_use_new ~ AGE_R + ED_Level + Full_part + Years_wk + pub_priv + work_flexM + work_lrnM + act_lrn + NFE12,data=Num_data_clean)
+#the proportional oadds assumption test for literacy model
+nominal_test(T_Model_Lit)
+#the proportional oadds assumption test for numeracy model
+nominal_test(T_Model_Num)
+```
